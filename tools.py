@@ -43,6 +43,9 @@ def tokeniser(dir_txt, filename):
     '''
     splits string into tokens
         (and removes punctuation tokens)
+
+    notes: words such as 'can't' will be destroyed into pieces (such as can and t) if you remove punctuation before tokenisation
+    ref: https://stackoverflow.com/questions/15547409/how-to-get-rid-of-punctuation-using-nltk-tokenizer
     '''
     with open(os.path.join(dir_txt, filename+'.txt'), 'r') as file:
         content = file.read()
@@ -58,17 +61,5 @@ def tokeniser(dir_txt, filename):
     # remove punctuation tokens
     tokens = list(filter( (lambda t: t not in string.punctuation), tokens))
 
+    # TO DO: consider words like 'eighty-seven'
     return tokens
-
-
-
-
-
-
-
-# TO DO: consider words like 'eighty-seven'
-
-'''
-words such as 'can't' will be destroyed into pieces (such as can and t) if you remove punctuation before tokenisation
-ref: https://stackoverflow.com/questions/15547409/how-to-get-rid-of-punctuation-using-nltk-tokenizer
-'''
