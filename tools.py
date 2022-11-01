@@ -3,6 +3,9 @@ import os
 import string
 import nltk
 from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+nltk.download('punkt')
+nltk.download('stopwords')
 
 
 def xml_to_txt(dir_xml, dir_txt, filename):
@@ -39,27 +42,27 @@ def xml_to_txt(dir_xml, dir_txt, filename):
 
 
 
-def tokeniser(dir_txt, filename):
+def tokeniser(text):
     '''
     splits string into tokens
-        (and removes punctuation tokens)
+        (and removes punctuation, stopword tokens)
 
     notes: words such as 'can't' will be destroyed into pieces (such as can and t) if you remove punctuation before tokenisation
     ref: https://stackoverflow.com/questions/15547409/how-to-get-rid-of-punctuation-using-nltk-tokenizer
     '''
-    with open(os.path.join(dir_txt, filename+'.txt'), 'r') as file:
-        content = file.read()
 
     # tokenise
-    try:
-        tokens = word_tokenize(content)
-        # print(tokens)
-    except LookupError:
-        nltk.download('punkt')
-        print('Download \'nltk punkt\'')
+    tokens = word_tokenize(text)
+    # print(tokens)
 
     # remove punctuation tokens
     tokens = list(filter( (lambda t: t not in string.punctuation), tokens))
+    print('Punctuation')
+    print(tokens)
+
+    # remove stop words tokens
+    tokens = list(filter( (lambda t: t not in stopwords.words('english')), tokens ))
+    print('stopwords')
 
     # TO DO: consider words like 'eighty-seven'
     return tokens

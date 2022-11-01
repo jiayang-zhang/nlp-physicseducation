@@ -9,5 +9,8 @@ filename = 'GS_BKZ271_Redacted'
 
 
 xml_to_txt(dir_xml, dir_txt, filename)
-tokens = tokeniser(dir_txt,filename)
+
+with open(os.path.join(dir_txt, filename+'.txt'), 'r') as file:
+    content = file.read()
+tokens = tokeniser(content)
 print(tokens)
