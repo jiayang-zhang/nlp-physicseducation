@@ -1,11 +1,11 @@
 from bs4 import BeautifulSoup as bs
 import os
 import string
-import nltk
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
-nltk.download('punkt')
-nltk.download('stopwords')
+
+import numpy as np
+
 
 
 def xml_to_txt(dir_xml, dir_txt, filename):
@@ -51,18 +51,22 @@ def tokeniser(text):
     ref: https://stackoverflow.com/questions/15547409/how-to-get-rid-of-punctuation-using-nltk-tokenizer
     '''
 
+    # 1. lowercase
+    text = text.lower()
+
     # tokenise
     tokens = word_tokenize(text)
     # print(tokens)
 
-    # remove punctuation tokens
+    # 2. remove punctuation tokens
     tokens = list(filter( (lambda t: t not in string.punctuation), tokens))
-    print('Punctuation')
-    print(tokens)
+    # print('Punctuation')
+    # print(tokens)
 
-    # remove stop words tokens
+    # 3. remove stop words tokens
     tokens = list(filter( (lambda t: t not in stopwords.words('english')), tokens ))
-    print('stopwords')
+    # print('stopwords')
+    # print(tokens)
 
     # TO DO: consider words like 'eighty-seven'
     return tokens
