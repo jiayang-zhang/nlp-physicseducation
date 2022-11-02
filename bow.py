@@ -33,7 +33,9 @@ filenames = ['test01', 'test02']
 '''
 ... each file --> tokens (saved to pandas)
 ... totaltext.txt --> tokens (saved to pandas)
+https://thatascience.com/learn-machine-learning/bag-of-words/
 ...
+....
 '''
 for filename in filenames:
     with open(os.path.join(dir_txt, filename+'.txt'), 'r') as file:
