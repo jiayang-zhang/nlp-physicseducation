@@ -1,55 +1,55 @@
-from tools import *
-'''
-# uncomment to download them
-import nltk
-nltk.download('punkt')
-nltk.download('stopwords')
-'''
+import os
+import pandas as pd
+from sklearn.feature_extraction.text import CountVectorizer
+
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn import metrics
+# ================================================================================================
+path = '/Users/jiayangzhang/Library/CloudStorage/OneDrive-ImperialCollegeLondon/year4/nlp-physicseducation/testfiles'
+files = ['test01.txt', 'test02.txt']
 # ================================================================================================
 
-dir_xml = '/Users/jiayangzhang/Library/CloudStorage/OneDrive-ImperialCollegeLondon/year4/anonymised_reports/year_1_2017/cycle_1/xml'
-dir_txt = '/Users/jiayangzhang/Library/CloudStorage/OneDrive-ImperialCollegeLondon/year4/anonymised_reports/year_1_2017/cycle_1/txt'
-filenames = ['test01', 'test02']
-# ================================================================================================
 
-# map .xml to .txt
-# for filename in filenames:
-    # xml_to_txt(dir_xml, dir_txt, filename)
-
-
-# create totaltext.txt
-# total = []
-# for filename in filenames:
-#     with open(os.path.join(dir_txt, filename+'.txt'), 'r') as file:
-#         content = file.read()
-#     total.append('  ,  ')
-#     total.append(content)
-# with open(os.path.join(dir_txt, 'totaltext.txt'), 'w') as file:
-#     file.write(' '.join(total))
+# create file&token dataframe
+df = pd.DataFrame(columns=['File','Content'])
+# read files
+for file in files:
+    with open(os.path.join(path, file), 'r') as f:
+        content = f.read()
+    # add new row to DataFrame
+    df.loc[len(df)] = [file, content]
 
 
+# -- Feature: Bag of Words ---
+countvec = CountVectorizer()
+dtm = countvec.fit_transform( df['Content'].tolist() ) # document-term matrix
+# create BoW dataframe
+BoW = pd.DataFrame(dtm.toarray(), columns= countvec.get_feature_names())
+# join two dataframes
+df = pd.merge(df, bow, left_index=True, right_index=True)
+# print dataframe (drop content column)
+print(df.drop('Content',axis=1))
 
-# convert files to tokens
+
+# -- Classification: logistic regression ---
 '''
-... each file --> tokens (saved to pandas)
-... totaltext.txt --> tokens (saved to pandas)
-https://thatascience.com/learn-machine-learning/bag-of-words/
-...
-....
-'''
-for filename in filenames:
-    with open(os.path.join(dir_txt, filename+'.txt'), 'r') as file:
-        content = file.read()
-    tokens = tokeniser(content)
-
-print(sorted(tokens))
-
-'''
-... BoW
-'''
-# from sklearn.feature_extraction.text import CountVectorizer
-# vectorizer = CountVectorizer()
-# X = vectorizer.fit_transform(tokens)
-# print(sorted(vectorizer.get_feature_names()))
+X = dtm.toarray()
+y = np.array([0,1]) #dummy_label
+# Create training and test split
+X_train, X_test, y_train, y_test = train_test_split(X, y)
+# Create an instance of LogisticRegression classifier
 #
-# print(X.toarray())
+lr = LogisticRegression(C=100.0, random_state=1, solver='lbfgs', multi_class='ovr')
+#
+# Fit the model
+#
+lr.fit(X_train, y_train)
+#
+# Create the predictions
+#
+y_predict = lr.predict(X_test)
+
+# Use metrics.accuracy_score to measure the score
+print("LogisticRegression Accuracy %.3f" %metrics.accuracy_score(y_test, y_predict))
+'''

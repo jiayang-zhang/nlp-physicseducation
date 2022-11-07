@@ -42,7 +42,7 @@ def xml_to_txt(dir_xml, dir_txt, filename):
 
 
 
-def tokeniser(text):
+def preprocess(text):
     '''
     splits string into tokens
         (and removes punctuation, stopword tokens)
