@@ -4,8 +4,8 @@ bag of words
 logistic regression
 '''
 
-from tools import *
-from clean import *
+from tools.xlsxer import *
+from tools.xmler import *
 import os
 import pandas as pd
 pd.set_option('max_colu', 10)
