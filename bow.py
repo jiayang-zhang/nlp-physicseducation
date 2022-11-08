@@ -1,6 +1,14 @@
+'''
+performs:
+bag of words
+logistic regression
+'''
+
 from tools import *
+from clean import *
 import os
 import pandas as pd
+pd.set_option('max_colu', 10)
 from sklearn.feature_extraction.text import CountVectorizer
 
 from sklearn.model_selection import train_test_split
@@ -22,23 +30,40 @@ corpus_wordvec_counts = None
 
 
 
-# create file&token dataframe
-df = pd.DataFrame(columns=['File','Content'])
+# -- Get files content---
+df_files = pd.DataFrame(columns=['StudentID','Content'])
 
 counter = 0
 for file in os.listdir(path):
     if file.startswith('GS_') and file.endswith('.txt'):
         counter += 1
+
+        # filename for dataframe
+        filename = file.rsplit('.', maxsplit=2)[0]
+
+        # file content for dataframe
         with open(os.path.join(path, file), 'r') as f:
             content = f.read()
         content = preprocess(content)
-        # add to corpus_text
-        corpus_text.append(content)
-        # add new row to DataFrame
-        df.loc[len(df)] = [file, content]
-print('Total number of files:', counter)
 
-# print(df)
+        # append to corpus_text []
+        corpus_text.append(content)
+
+        # add new row to DataFrame
+        df_files.loc[len(df_files)] = [filename, content]
+
+# print('Total number of files:', counter)
+# print(df_files)
+
+
+
+# -- Get labels ---
+df_labels = strip_labels('data/labels.xlsx')
+# merge df_files and df_labels
+df = pd.merge(df_files, df_labels, left_on='StudentID', right_on='StudentID')
+# print(df.drop(['Content'], axis = 1))
+df.to_csv('data/labels_cleaned.csv')
+
 
 
 # -- Feature: Bag of Words ---
@@ -51,10 +76,10 @@ corpus_wordvec_counts = dtm.toarray()
 # print(corpus_wordvec_names)
 
 # create BoW dataframe
-BoW = pd.DataFrame(dtm.toarray(), columns= countvec.get_feature_names())
-df = pd.merge(df, BoW, left_index=True, right_index=True)
-# # print dataframe (drop content column)
-# print(df)
+# df_bow = pd.DataFrame(dtm.toarray(), columns= countvec.get_feature_names())
+# df = pd.merge(df, df_bow, left_index=True, right_index=True)
+# print dataframe (drop content column)
+print(df.drop(['Content'], axis = 1))
 
 
 # -- Classification: logistic regression ---

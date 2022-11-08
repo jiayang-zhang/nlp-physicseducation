@@ -1,3 +1,7 @@
+'''
+tools for processing xml files, and txt files
+'''
+
 from bs4 import BeautifulSoup as bs
 import os
 import string
