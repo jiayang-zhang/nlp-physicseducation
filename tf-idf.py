@@ -37,7 +37,7 @@ print(df['StudentID'].tolist())
 # To call of string lists of reports for feature extraction
 print(df['Content'].tolist())
 # To see everything
-print(df)
+print(df.drop(['Content'], axis = 1)) #  the 'Content' column is too overwhelming
 
 
 
