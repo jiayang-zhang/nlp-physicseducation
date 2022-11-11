@@ -4,16 +4,25 @@ tools for processing xlsx files
 
 import pandas as pd
 
-def strip_labels(xlsx_dir):
+
+
+def build_labels_dataframe(dir_xlsx):
     '''
+
+    converts a csv file of labels to a dataframe,
+
+    index       StudentID            ArgumentLevel       ReasoningLevel
+        0       GS_xxx_Redacted      xyz                 xyz
+
+
     input --
-        xlsx_dir: directory to xlsx file
+        dir_xlsx: directory to xlsx file
 
     output --
         df_labels: pd dataframe of cleaned xlsx
     '''
 
-    df_labels = pd.read_excel(xlsx_dir)
+    df_labels = pd.read_excel(dir_xlsx)
 
     # format items in StudentID
     for id in df_labels['StudentID']:
@@ -30,7 +39,3 @@ def strip_labels(xlsx_dir):
         df_labels = df_labels.replace(i, i.lower())
 
     return df_labels
-
-
-# df = strip_labels('data/labels.xlsx')
-# print(df)

@@ -7,9 +7,91 @@ import os
 import string
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
-
+import pandas as pd
 import numpy as np
 
+
+# ========================================================================================
+#       Functions for .txt files
+# ========================================================================================
+
+def build_files_dataframe(dir_txtfldr, str_start, str_end):
+    '''
+    compile name and contents of txt files to a dataframe
+
+    index       StudentID            Content
+        0       GS_xxx_Redacted      xyz            
+
+
+    inputs --
+        path:           dir to txt folder
+        str_start:      shared string at the start of the filename.  e.g. 'GS_'
+        str_end:        shared string at the end of the filename.  e.g. '.txt'
+
+    returns --
+        df_files:       dataframe ['StudentID', 'Content']
+    '''
+    df_files = pd.DataFrame(columns=['StudentID','Content'])
+
+    for file in os.listdir(dir_txtfldr):
+        if file.startswith(str_start) and file.endswith(str_end):
+
+            # filename for dataframe
+            filename = file.rsplit('.', maxsplit=2)[0]
+
+            # file content for dataframe
+            with open(os.path.join(dir_txtfldr, file), 'r') as f:
+                content = f.read()
+            content = preprocess(content)
+
+            # add new row to DataFrame
+            df_files.loc[len(df_files)] = [filename, content]
+
+    return df_files
+
+
+def preprocess(text):
+    '''
+    splits string into tokens
+        (and removes punctuation, stopword tokens)
+
+    input --
+        text: a string of words
+
+    returns --
+        text: a string of words
+
+    notes: words such as 'can't' will be destroyed into pieces (such as can and t) if you remove punctuation before tokenisation
+    ref: https://stackoverflow.com/questions/15547409/how-to-get-rid-of-punctuation-using-nltk-tokenizer
+    '''
+
+    # 1. lowercase
+    text = text.lower()
+
+    # tokenise
+    tokens = word_tokenize(text)
+    # print(tokens)
+
+    # 2. remove punctuation tokens
+    tokens = list(filter( (lambda t: t not in string.punctuation), tokens))
+    # print(tokens)
+
+    # 3. remove stop words tokens
+    # tokens = list(filter( (lambda t: t not in stopwords.words('english')), tokens ))
+
+    # token back to text
+    text = ' '.join(str(x) for x in tokens)
+
+    # TO DO: consider words like 'eighty-seven'
+    return text  # change to text
+
+
+
+
+
+# ========================================================================================
+#       Functions for .xml files
+# ========================================================================================
 
 
 def xml_to_txt(dir_xml, dir_txt, filename, alltext = True, processtext = True):
@@ -90,33 +172,3 @@ def getall(dir_xml, filename):
         out.append(plabel.get_text().lower())
 
     return out
-
-
-def preprocess(text):
-    '''
-    splits string into tokens
-        (and removes punctuation, stopword tokens)
-
-    notes: words such as 'can't' will be destroyed into pieces (such as can and t) if you remove punctuation before tokenisation
-    ref: https://stackoverflow.com/questions/15547409/how-to-get-rid-of-punctuation-using-nltk-tokenizer
-    '''
-
-    # 1. lowercase
-    text = text.lower()
-
-    # tokenise
-    tokens = word_tokenize(text)
-    # print(tokens)
-
-    # 2. remove punctuation tokens
-    tokens = list(filter( (lambda t: t not in string.punctuation), tokens))
-    # print(tokens)
-
-    # 3. remove stop words tokens
-    # tokens = list(filter( (lambda t: t not in stopwords.words('english')), tokens ))
-
-    # token back to text
-    text = ' '.join(str(x) for x in tokens)
-
-    # TO DO: consider words like 'eighty-seven'
-    return text  # change to text
