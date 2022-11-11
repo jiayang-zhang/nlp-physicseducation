@@ -14,9 +14,9 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn import metrics
-# ================================================================================================
+# =======================================================================================================================================
 dir_txtfldr = '/Users/jiayangzhang/Library/CloudStorage/OneDrive-ImperialCollegeLondon/year4/anonymised_reports/year_1_2017/cycle_1/txt'
-# ================================================================================================
+# =======================================================================================================================================
 
 # -- Get files ---
 df_files = build_files_dataframe(dir_txtfldr, 'GS_', '.txt')
