@@ -54,13 +54,6 @@ print(df.drop(['Content'], axis = 1)) #  the 'Content' column is too overwhelmin
 
 
 # -- Feature extraction: TF-IDF ---
-# word vectors
-corpus_wordvec_names = None                    # word vector name list
-corpus_wordvec_counts = None                   # word vector frequncy list    # len(corpus_wordvec_counts) = index(dataframe)
-
-
-
-# -- Feature: TF-IDF ---
 def tf_idf(dataframe):
     # performs tf_idf on the dataframe
     v    = TfidfVectorizer()
