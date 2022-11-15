@@ -103,7 +103,7 @@ def xml_to_txt(dir_xml, dir_txt, filename, alltext = True, processtext = True):
     '''
 
     # get text output
-    if alltext == True:
+    if alltext:
         out = getall(dir_xml, filename)
     else:
         out = getparagraphs(dir_xml, filename)
@@ -113,7 +113,7 @@ def xml_to_txt(dir_xml, dir_txt, filename, alltext = True, processtext = True):
     try:
         with open(os.path.join(dir_txt, filename+'.txt'), 'w') as file:
             content = ' '.join(out)
-            if processtext == True:
+            if processtext:
                 file.write(preprocess(content))
             else:
                 file.write(content)
