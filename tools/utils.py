@@ -1,7 +1,3 @@
-'''
-tools for processing xml files, and txt files
-'''
-
 from bs4 import BeautifulSoup as bs
 import os
 import string
@@ -12,15 +8,15 @@ import numpy as np
 
 
 # ========================================================================================
-#       Functions for .txt files
+# for .txt files
 # ========================================================================================
 
-def build_files_dataframe(dir_txtfldr, str_start, str_end):
+def build_files_dataframe(dir_txtfldr, str_start, str_end) -> pd.DataFrame:
     '''
     compile name and contents of txt files to a dataframe
 
     index       StudentID            Content
-        0       GS_xxx_Redacted      xyz            
+        0       GS_xxx_Redacted      xyz
 
 
     inputs --
@@ -90,7 +86,7 @@ def preprocess(text):
 
 
 # ========================================================================================
-#       Functions for .xml files
+# for .xml files
 # ========================================================================================
 
 
@@ -172,3 +168,43 @@ def getall(dir_xml, filename):
         out.append(plabel.get_text().lower())
 
     return out
+
+
+
+# ================================================================================================
+# for .xlsx files
+# ================================================================================================
+
+def build_labels_dataframe(dir_xlsx) -> pd.DataFrame:
+    '''
+
+    converts a csv file of labels to a dataframe,
+
+    index       StudentID            ArgumentLevel       ReasoningLevel
+        0       GS_xxx_Redacted      xyz                 xyz
+
+
+    input --
+        dir_xlsx: directory to xlsx file
+
+    output --
+        df_labels: pd dataframe of cleaned xlsx
+    '''
+
+    df_labels = pd.read_excel(dir_xlsx)
+
+    # format items in StudentID
+    for id in df_labels['StudentID']:
+        if not id.startswith('GS_') and not id.endswith('_Redacted'):
+            df_labels = df_labels.replace(id, 'GS_'+id+'_Redacted')
+
+        elif not id.endswith('_Redacted'):
+            df_labels = df_labels.replace(id, id+'_Redacted')
+
+    # lowercase labels
+    for i in df_labels['ArgumentLevel']:
+        df_labels = df_labels.replace(i, i.lower())
+    for i in df_labels['ReasoningLevel']:
+        df_labels = df_labels.replace(i, i.lower())
+
+    return df_labels
