@@ -3,11 +3,22 @@
 import os
 from bs4 import BeautifulSoup as bs
 import numpy as np
+
+import nltk
+
 from nltk.tokenize import RegexpTokenizer
 from nltk.stem import PorterStemmer 
 from nltk.stem import WordNetLemmatizer
+
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import TfidfTransformer
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import MultinomialNB
+from sklearn import metrics
+
+import pandas as pd
 from collections import Counter 
+
 #%%
 dir1  = '/Users/EfiaA/OneDrive - Imperial College London/Imperial academic work/University life/Y4/MSci project/Project_Coding/anonymised_reports/anonymised_reports/year_1_2017/cycle_1/xml'
 filename = 'GS_BKZ271_Redacted'
@@ -24,17 +35,21 @@ def openAllFiles(direc):
             count +=1  # there are 86 files  (unit test checks)
             soup = bs(contents, 'xml')
             page = [head.get_text() for head in soup.find_all('p')]
-            out.append(page[8:]) # manage this more 
-    text_array = np.concatenate(out, axis = 0)
+            out.append(page[5:]) # manage this more 
+    #text_array = np.concatenate(out, axis = 0)
     return  out
 
-y = ["BAL", "BAL", "THE", "THE", "THE", "BAL", "BAL", "EXP", "THE", "THE", "BAL", "EXP",
-"BAL", "BAL ", "BAL", "THE","EXP","THE","EXP","BAL", "BAL","THE", "BAL", "BAL", "BAL", "BAL", 
-"BAL", "BAL","BAL", "BAL", "BAL", "NONE", "BAL"
+y =["BAL", "BAL", "THE", "THE", "THE",
+"BAL", "BAL", "EXP", "THE", "THE", "BAL", "EXP",
+"BAL", "BAL ", "BAL", "THE","EXP","THE","EXP",
+"BAL", "BAL","THE", "BAL", "BAL", "BAL", "BAL", 
+"BAL", "BAL","BAL", "BAL", "BAL", "NONE", "BAL",
 "BAL","BAL", "BAL","THE", "BAL", "THE", "BAL", 
-"BAL", "BAL", "BAL","THE", "BAL","THE", "THE", "BAL", "THE"]
+"BAL", "BAL", "BAL","THE", "BAL","THE", "THE",
+"BAL"]
 
 print(len(y))
+
 
 #%%
 
@@ -81,8 +96,10 @@ def bow(arr):
     return  bow_per_doc
 
 def tfidf(arr):
+
     tfidf = TfidfVectorizer(preprocessor=lambda x: x, tokenizer=lambda x: x)
-    tfidf_matrix = tfidf.fit_transform(arr)
+    x = tfidf.fit(arr)
+    tfidf_matrix = tfidf.transform(arr)
     dense = tfidf_matrix.toarray()
     
     
@@ -99,12 +116,17 @@ def tfidf(arr):
     '''
     return dense
 
+def tfidf2(arr):
+    tf_transformer = TfidfTransformer(use_idf=True).fit(arr)
+    X_train_tf = tf_transformer.transform(arr)
+    size = X_train_tf.shape
+    return X_train_tf, size
 
 def train_validate_train_data_split(x):
     #train, validation and test datasets
     t_data_60 = int(0.6*len(x))
     v_data_60_80 = int(0.8*len(x))
-    train, valid, test = np.split(x, [t_data_60, v_data_60_80])
+    train, valid, test = np.split(x,np.array([t_data_60, v_data_60_80], dtype = "object"))
     return train, valid, test
 
 def pre_process_text(directory):
@@ -112,62 +134,35 @@ def pre_process_text(directory):
     tokenised_text = tokeniser(array_of_text)
     stemmed_text = stem(tokenised_text)
     lemmatised_text = lemmatizer(stemmed_text)
-    necessary_files = lemmatised_text[22:69]
+    necessary_files = lemmatised_text[22:70]
     return necessary_files
 
-
+def dframe(arr1, arr2):
+    df = pd.DataFrame({'1': arr1, '2': arr2})
+    return df
 #%%
 #pre-processed text
 pptxt = pre_process_text(dir1)
-#%%
-x_train_data = train_validate_train_data_split(pptxt)[0]
-x_valid_data = train_validate_train_data_split(pptxt)[1]
-x_test_data  = train_validate_train_data_split(pptxt)[2]
 
-#%%
-#y data - labels
-y_train_data = train_validate_train_data_split(y)[0]
-y_valid_data = train_validate_train_data_split(y)[1]
-y_test_data  = train_validate_train_data_split(y)[2]
-print(len(y_train_data))
+
 #%%
 # feature extraction
-tfidf_text_train = tfidf(x_train_data)
-tfidf_text_test = tfidf(x_test_data)
-bow_text_train   = bow(x_train_data)
-bow_text_test   = bow(x_test_data)
-
-print(len(tfidf_text_train))
-print(len(tfidf_text_test))
+tfidf_text = tfidf(pptxt)
+print(tfidf_text)
 
 #%%
-'''
-FOOD FOR THOUGHT:
-    - import csv file of the high level rating s
-    - Uses the pandas data frame to associate the high level reasoning to the individual 
-    array elements
-'''
-
+#dataset = pd.DataFrame({'labels': y, 'Documents': tfidf_text})
+#print(dataset)
 #%%
-# we want to choose features 
-#import Naive Bayes Classifier
-from sklearn.naive_bayes import MultinomialNB
+from sklearn.metrics import classification_report
 
-#classification report offered by sklear
-from sklearn.metrics  import classification_report
+X_train, X_test, y_train, y_test = train_test_split( tfidf_text, y, test_size= 0.3, random_state=0)
 
-'''
-Naive Bayes Classifier
-'''
-nb_model = MultinomialNB()
-nb_model.fit(tfidf_text_train, y_train_data)
-y_pred = nb_model.predict(tfidf_text_test)
+clf       = MultinomialNB().fit(X_train, y_train)
+predicted = clf.predict(X_test)
 
-#classification report 
-print(classification_report(y_test_data, y_pred))
-#%%
-x = [1,22]
-print(type(x))
+print('MultinomialNB Accuracy:', metrics.accuracy_score(y_test, predicted))
+print(classification_report(y_test, predicted))
 
 
-    
+
