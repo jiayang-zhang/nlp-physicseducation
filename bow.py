@@ -25,17 +25,25 @@ wordvec_names, wordvec_counts = ml_tools.BoW(df['Content'].tolist())
 
 
 # -- Classification: logistic regression ---
-# Create training and test split
-X_train, X_test, y_train, y_test = train_test_split(wordvec_counts, df['ArgumentLevel'].tolist(), train_size = 0.6)
-print(len(X_train))
-print(len(y_train))
 
-# Create an instance of LogisticRegression classifier
-lr = LogisticRegression(random_state=0)
-# Fit the model
-lr.fit(X_train, y_train)
+iterations = 10
+sum = 0
+for i in range(iterations):
+    # Create training and test split
+    X_train, X_test, y_train, y_test = train_test_split(wordvec_counts, df['ArgumentLevel'].tolist(), train_size = 0.8)
+    # print(len(X_train))
+    # print(len(y_train))
 
-# Sanity check - training data
-y_predict = ml_tools.sanity_check(lr.predict, X_train, y_train, printWrong=False)
-# Prediction - test data
-y_predict = ml_tools.sanity_check(lr.predict, X_test, y_test, printWrong=False)
+    # Create an instance of LogisticRegression classifier
+    lr = LogisticRegression(random_state=0)
+    # Fit the model
+    lr.fit(X_train, y_train)
+
+    # Sanity check - training data
+    # ml_tools.sanity_check(lr.predict, X_train, y_train, printWrong=False)
+
+    # Prediction - test data
+    accuracy_score = ml_tools.sanity_check(lr.predict, X_test, y_test, printWrong=False)
+    sum += accuracy_score
+
+print('average accuracy score:', sum/iterations)
