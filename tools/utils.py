@@ -1,12 +1,20 @@
 from bs4 import BeautifulSoup as bs
 import os
 import string
-from nltk.tokenize import word_tokenize
-from nltk.corpus import stopwords
 import pandas as pd
 import numpy as np
 
-
+import nltk
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords, wordnet
+from nltk.stem import WordNetLemmatizer
+'''
+nltk.download('punkt')
+nltk.download('stopwords')
+nltk.download('wordnet')
+nltk.download('omw-1.4')
+nltk.download('averaged_perceptron_tagger')
+'''
 # ========================================================================================
 # for .txt files
 # ========================================================================================
@@ -75,6 +83,10 @@ def preprocess(text):
     # 3. remove stop words tokens
     # tokens = list(filter( (lambda t: t not in stopwords.words('english')), tokens ))
 
+    # 4. lemmatization
+    lemmatizer = WordNetLemmatizer()
+    tokens = [lemmatizer.lemmatize(w, get_wordnet_pos(w)) for w in tokens]
+
     # token back to text
     text = ' '.join(str(x) for x in tokens)
 
@@ -82,7 +94,15 @@ def preprocess(text):
     return text  # change to text
 
 
+def get_wordnet_pos(word):
+    """Map POS tag to first character lemmatize() accepts"""
+    tag = nltk.pos_tag([word])[0][1][0].upper()
+    tag_dict = {"J": wordnet.ADJ,
+                "N": wordnet.NOUN,
+                "V": wordnet.VERB,
+                "R": wordnet.ADV}
 
+    return tag_dict.get(tag, wordnet.NOUN)
 
 
 # ========================================================================================

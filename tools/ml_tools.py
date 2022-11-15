@@ -1,4 +1,5 @@
 from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.linear_model import LogisticRegression
 from sklearn import metrics
 
 # ================================================================================================
@@ -23,6 +24,21 @@ def BoW(corpus):
 
     return corpus_wordvec_names, corpus_wordvec_counts
 
+
+# ================================================================================================
+# supervised classifion
+# ================================================================================================
+
+# -- Classification: logistic regression ---
+def logistic_regression(X_train, y_train):
+
+    # Create an instance of LogisticRegression classifier
+    lr = LogisticRegression(random_state=0)
+    # Fit the model
+    lr.fit(X_train, y_train)
+
+    return lr.predict # returns classifier model
+
 # ================================================================================================
 # evaluation
 # ================================================================================================
@@ -30,15 +46,19 @@ def BoW(corpus):
 def sanity_check(model, X_input, y_input, printWrong=True):
     y_predict = model(X_input)
 
+    # accuracy score
+    accuracy = metrics.accuracy_score(y_input, y_predict)
+
     if printWrong:
-        flag = True
-        for i in range(len(X_input)):
-            if y_input[i] != y_predict[i]:
-                print('wrong prediction:', y_input[i], y_predict[i])
-                flag = False
+        # flag = True
+        # for i in range(len(X_input)):
+        #     if y_input[i] != y_predict[i]:
+        #         print('wrong prediction:', y_input[i], y_predict[i])
+        #         flag = False
         # print(flag)
-    # print('Manual labels:', y_input,'\n','Predicted labels:',y_predict)
 
-    print("LogisticRegression Accuracy %.3f" %metrics.accuracy_score(y_input, y_predict))
+        # print('Manual labels:', y_input,'\n','Predicted labels:',y_predict)
 
-    return
+        print("LogisticRegression Accuracy %.3f" %accuracy)
+
+    return accuracy
