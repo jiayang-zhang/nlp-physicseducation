@@ -1,9 +1,3 @@
-'''
-performs:
-tf-ifd
-naive_bayes
-'''
-
 import os
 import pandas as pd
 import numpy as np
@@ -22,52 +16,37 @@ from sklearn.naive_bayes import MultinomialNB
 # metrics imports
 from sklearn import metrics
 from sklearn.metrics import classification_report
+from tools import utils, ml_tools
 # ================================================================================================
 #path = '/Users/jiayangzhang/Library/CloudStorage/OneDrive-ImperialCollegeLondon/year4/nlp-physicseducation/testfiles'
-files = ['test01.txt', 'test02.txt']
 path= '/Users/EfiaA/OneDrive - Imperial College London/Imperial academic work/University life/Y4\MSci project/Project_Coding/nlp-physicseducation/testfiles'
+dir_txtfldr = '/Users/EfiaA/OneDrive - Imperial College London/Imperial academic work/University life/Y4/MSci project/Project_Coding/anonymised_reports/anonymised_reports/year_1_2017/cycle_1/txt'
 # ================================================================================================
 
 
 # -- Get files ---
-df_files = build_files_dataframe(dir_txtfldr, 'GS_', '.txt')
+df_files = utils.build_files_dataframe(dir_txtfldr, 'GS_', '.txt')
 
 # -- Get labels ---
-df_labels = build_labels_dataframe('data/labels.xlsx')
+df_labels = utils.build_labels_dataframe('data/labels.xlsx')
 
 # -- Merge dataframes --
 df = pd.merge(df_files, df_labels, left_on='StudentID', right_on='StudentID')      # merged dataframe: StudentID, Content, ArgumentLevel, ReasoningLevel
 
 
-"""
-Examples
-"""
-# To call 'ArgumentLevel' labels
-ArgumentLevel_list = print(df['ArgumentLevel'].tolist())
-# To see the corresponding document names
-print(df['StudentID'].tolist())
-# To call of string lists of reports for feature extraction
-print(df['Content'].tolist())
-# To see everything
-print(df.drop(['Content'], axis = 1)) #  the 'Content' column is too overwhelming
-
-
 
 # -- Feature extraction: TF-IDF ---
-def tf_idf(dataframe):
+def tf_idf(corpus):
     # performs tf_idf on the dataframe
     v    = TfidfVectorizer()
-    x    = v.fit_transform(dataframe)
+    x    = v.fit_transform(corpus)
     #s_m  = x.toarray()
     return x
 
-print(tf_idf(df['Content']))
-
-
 
 # --- Classification: Naive Bayes classifier ----
-X = dtm.toarray()
-y = df['Reasoning level']
+X = tf_idf(df['Content'].tolist())
+y = df['ReasoningLevel']
 X_train, X_test, y_train, y_test = train_test_split(X, y)
 clf       = MultinomialNB().fit(X_train, y_train)
 predicted = clf.predict(X_test)
