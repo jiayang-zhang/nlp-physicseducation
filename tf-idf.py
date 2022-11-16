@@ -63,14 +63,22 @@ X_train_t, X_test_t, y_train_t, y_test_t = train_test_split(X_t, y)
 clf_t      = MultinomialNB().fit(X_train_t, y_train_t)
 predicted_t = clf_b.predict(X_test_t)
 
+'''
+----- KEY INFORMATION! --------
+For the train_test_split the documentation shows
+ 1. random_state = 42 | controls the shuffling applied in data before applying the split#
+  link: https://scikit-learn.org/stable/glossary.html#term-random_state
+ 2. shuffle = True | you can shuffle before splitting 
+ 3. stratify = 
+
+More on the different functions to use to split shuffle and stratify data
+ https://scikit-learn.org/stable/modules/cross_validation.html#stratification
+
+ Stratified k fold
+ stratified shuffle split
+'''
+
 print('MultinomialNB Accuracy, using BOW feature extraction:', metrics.accuracy_score(y_test_b, predicted_b))
 print('MultinomialNB Accuracy, using TF-IDF feature extraction:', metrics.accuracy_score(y_test_t, predicted_t))
 #print(classification_report(y_test_, predicted))
 
-#%%
-
-# --- histogram of label frequency --- 
-label = df['ReasoningLevel'].plot().hist()
-print(label)
-
-# %%
