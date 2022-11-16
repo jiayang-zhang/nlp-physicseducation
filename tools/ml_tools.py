@@ -1,6 +1,7 @@
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn import metrics
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 # ================================================================================================
 # feature extraction
@@ -24,7 +25,13 @@ def BoW(corpus):
 
     return corpus_wordvec_names, corpus_wordvec_counts
 
-
+def tf_idf(corpus):
+    # performs tf_idf on the dataframe
+    v    = TfidfVectorizer()
+    x    = v.fit_transform(corpus)
+    s_m  = x.toarray()
+    return s_m
+    
 # ================================================================================================
 # supervised classifion
 # ================================================================================================
