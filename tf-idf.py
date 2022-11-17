@@ -1,5 +1,5 @@
 
-import os
+
 import pandas as pd
 import numpy as np
 
@@ -10,9 +10,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 #machine learning method imports
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
-
 from sklearn.naive_bayes import MultinomialNB
+from sklearn.model_selection import KFold
 
 # metrics imports
 from sklearn import metrics
@@ -51,6 +50,7 @@ X_t= tf_idf(df['Content'].tolist())
 
 # --- Classification: Naive Bayes classifier ----
 
+#%%
 # --- classify using bow feature extraction ---
 y = df['ReasoningLevel']
 X_train_b, X_test_b, y_train_b, y_test_b = train_test_split(wordvec_counts, df['ReasoningLevel'].tolist(), train_size = 0.8)
@@ -59,9 +59,19 @@ predicted_b = clf_b.predict(X_test_b)
 
 
 # --- classify using tf-idf feature extraction---
-X_train_t, X_test_t, y_train_t, y_test_t = train_test_split(X_t, y)
-clf_t      = MultinomialNB().fit(X_train_t, y_train_t)
-predicted_t = clf_b.predict(X_test_t)
+#%%
+#from sklearn.model_selection import StratifiedKFold
+kf = KFold(n_splits=5)
+#skf = StratifiedKFold(n_splits=10)
+# -- NB, TF-IDF, KFOLD ----
+for train_index, test_index in kf.split(X_t):
+    print('TRAIN:', train_index, 'TEST:', test_index)
+    X_train_t, X_test_t = X_t[train_index], X_t[test_index]
+    y_train_t, y_test_t = y[train_index], y[test_index]
+    clf_t      = MultinomialNB().fit(X_train_t, y_train_t)
+    predicted_t = clf_b.predict(X_test_t)
+    print(predicted_t)
+
 
 '''
 ----- KEY INFORMATION! --------
