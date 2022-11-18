@@ -31,40 +31,41 @@ def tf_idf(corpus):
     x    = v.fit_transform(corpus)
     s_m  = x.toarray()
     return s_m
-    
+
 # ================================================================================================
 # supervised classifion
 # ================================================================================================
 
 # -- Classification: logistic regression ---
-def logistic_regression(X_train, y_train):
+def logistic_regression(X_train, y_train, X_test):
 
     # Create an instance of LogisticRegression classifier
     lr = LogisticRegression(random_state=0)
+
     # Fit the model
     lr.fit(X_train, y_train)
+    y_test_predict = lr.predict(X_test)
 
-    return lr.predict # returns classifier model
+    return  y_test_predict
 
 # ================================================================================================
 # evaluation
 # ================================================================================================
 
-def sanity_check(model, X_input, y_input, printWrong=True):
-    y_predict = model(X_input)
+def sanity_check(X_test, y_test, y_test_predict, printWrong=True):
 
     # accuracy score
-    accuracy = metrics.accuracy_score(y_input, y_predict)
+    accuracy = metrics.accuracy_score(y_test, y_test_predict)
 
     if printWrong:
-        # flag = True
-        # for i in range(len(X_input)):
-        #     if y_input[i] != y_predict[i]:
-        #         print('wrong prediction:', y_input[i], y_predict[i])
-        #         flag = False
-        # print(flag)
+        flag = True
+        for i in range(len(X_test)):
+            if y_test[i] != y_test_predict[i]:
+                print('wrong prediction:', y_test[i], y_test_predict[i])
+                flag = False
+        print(flag)
 
-        # print('Manual labels:', y_input,'\n','Predicted labels:',y_predict)
+        print('Manual labels:', y_test,'\n','Predicted labels:',y_test_predict)
 
         print("LogisticRegression Accuracy %.3f" %accuracy)
 

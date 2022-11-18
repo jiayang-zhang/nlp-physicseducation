@@ -17,30 +17,20 @@ from sklearn.metrics import classification_report
 from tools import utils, ml_tools
 
 
-# ================================================================================================
-#path = '/Users/jiayangzhang/Library/CloudStorage/OneDrive-ImperialCollegeLondon/year4/nlp-physicseducation/testfiles'
-path= '/Users/EfiaA/OneDrive - Imperial College London/Imperial academic work/University life/Y4\MSci project/Project_Coding/nlp-physicseducation/testfiles'
-dir_txtfldr = '/Users/EfiaA/OneDrive - Imperial College London/Imperial academic work/University life/Y4/MSci project/Project_Coding/anonymised_reports/anonymised_reports/year_1_2017/cycle_1/txt'
-# ================================================================================================
+# =======================================================================================================================================
+dir_csv = 'outputs/labels_cleaned.csv'
+# =======================================================================================================================================
+
+df = pd.read_csv(dir_csv, encoding='utf-8')
 
 
-# -- Get files ---
-df_files = utils.build_files_dataframe(dir_txtfldr, 'GS_', '.txt')
-
-# -- Get labels ---
-df_labels = utils.build_labels_dataframe('data/labels.xlsx')
-
-# -- Merge dataframes --
-df = pd.merge(df_files, df_labels, left_on='StudentID', right_on='StudentID')      # merged dataframe: StudentID, Content, ArgumentLevel, ReasoningLevel
-
-from sklearn.feature_extraction.text import TfidfVectorizer
 def tf_idf(corpus):
     # performs tf_idf on the dataframe
     v    = TfidfVectorizer()
     x    = v.fit_transform(corpus)
     s_m  = x.toarray()
     return s_m
-    
+
 # -- Bag of Words ---
 wordvec_names, wordvec_counts= ml_tools.BoW(df['Content'].tolist())
 # -- Feature extraction: TF-IDF ---
@@ -60,7 +50,7 @@ predicted_b = clf_b.predict(X_test_b)
 #%%
 #from sklearn.model_selection import StratifiedKFold
 kf = KFold(n_splits=5)
-#skf = StratifiedKFold(n_splits=10) --> the results are worse for stratified sampling 
+#skf = StratifiedKFold(n_splits=10) --> the results are worse for stratified sampling
 
 
 
@@ -86,8 +76,8 @@ print('Average accuracy:', average_accuracy)
 For the train_test_split the documentation shows
  1. random_state = 42 | controls the shuffling applied in data before applying the split#
 link: https://scikit-learn.org/stable/glossary.html#term-random_state
- 2. shuffle = True | you can shuffle before splitting 
- 3. stratify = 
+ 2. shuffle = True | you can shuffle before splitting
+ 3. stratify =
 
 More on the different functions to use to split shuffle and stratify data
  https://scikit-learn.org/stable/modules/cross_validation.html#stratification
@@ -102,4 +92,3 @@ More on the different functions to use to split shuffle and stratify data
 print('MultinomialNB Accuracy, using BOW feature extraction:', metrics.accuracy_score(y_test_b, predicted_b))
 print('MultinomialNB Accuracy, using TF-IDF feature extraction:', metrics.accuracy_score(y_test_t, predicted_t))
 #print(classification_report(y_test_, predicted))
-

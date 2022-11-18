@@ -128,17 +128,20 @@ def xml_to_txt(dir_xml, dir_txt, filename, alltext = True, processtext = True):
     else:
         out = getparagraphs(dir_xml, filename)
 
-
     # write output to .txt file
-    try:
-        with open(os.path.join(dir_txt, filename+'.txt'), 'w') as file:
-            content = ' '.join(out)
-            if processtext:
-                file.write(preprocess(content))
-            else:
-                file.write(content)
-    except FileNotFoundError:
-        print("The .txt directory does not exist")
+    if out == []: # if file is empty
+        print('WARNING: '+ filename + '.xml file is empty')
+        pass
+    else:
+        try:
+            with open(os.path.join(dir_txt, filename+'.txt'), 'w') as file:
+                content = ' '.join(out)
+                if processtext:
+                    file.write(preprocess(content))
+                else:
+                    file.write(content)
+        except FileNotFoundError:
+            print("The .txt directory does not exist")
 
     return
 
