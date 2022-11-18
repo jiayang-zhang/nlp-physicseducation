@@ -176,7 +176,7 @@ def getall(dir_xml, filename):
 
     # read .xml file
     try:
-        with open(os.path.join(dir_xml, filename+'.tei.xml'), 'r') as file: # parse xml as txt
+        with open(os.path.join(dir_xml, filename+'.tei.xml'), 'r', errors= 'ignore') as file: # parse xml as txt
             content = file.read()
     except FileNotFoundError:
         print(("The .xml directory does not exist"))
