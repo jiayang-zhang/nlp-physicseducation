@@ -16,7 +16,7 @@ dir_csv = 'outputs/labels_cleaned.csv'
 
 # iterate over xml files in a folder, and
 # map a xml file to a txt file
-'''
+
 counter = 0
 for file in os.listdir(dir_xml):
     if file.startswith('GS_') and file.endswith('.tei.xml'):
@@ -33,7 +33,7 @@ df_labels = utils.build_labels_dataframe('data/labels.xlsx')
 # -- Merge dataframes --
 df = pd.merge(df_files, df_labels, left_on='StudentID', right_on='StudentID')      # merged dataframe: StudentID, Content, ArgumentLevel, ReasoningLevel
 df.to_csv('outputs/labels_cleaned.csv', encoding='utf-8')
-'''
+
 
 '''
 # Counts bar plots
