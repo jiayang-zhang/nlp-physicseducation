@@ -1,18 +1,33 @@
 from tools import ml_tools, utils
 import os
 import pandas as pd
-pd.set_option('max_colu', 10)
+
+# who developed transformers packages?
+from transformers import BertModel, BertConfig, BertTokenizer, AdamW, get_cosine_schedule_with_warmup
 
 
-from sklearn.model_selection import train_test_split
 
 # =======================================================================================================================================
-dir_txtfldr = '/Users/jiayangzhang/Library/CloudStorage/OneDrive-ImperialCollegeLondon/year4/anonymised_reports/year_1_2017/cycle_1/txt'
+# input paths
+dir_csv = 'outputs/labels_cleaned.csv'
+
+# output paths
+bert_path = 'outputs/bert_model/'    # TODO: 该文件夹下存放三个文件（'vocab.txt', 'pytorch_model.bin', 'config.json'）
 # =======================================================================================================================================
 
-# -- Get files ---
-df_files = utils.build_files_dataframe(dir_txtfldr, 'GS_', '.txt')
-# -- Get labels ---
-df_labels = utils.build_labels_dataframe('data/labels.xlsx')
-# -- Merge dataframes --
-df = pd.merge(df_files, df_labels, left_on='StudentID', right_on='StudentID')      # merged dataframe: StudentID, Content, ArgumentLevel, ReasoningLevel
+df = pd.read_csv(dir_csv, encoding='utf-8')
+
+# find max length of text from one documents
+'''
+maxlen = 0
+for list in df['Content'].tolist():
+    if len(list) > maxlen:
+        maxlen = len(list)
+print(maxlen)
+'''
+
+# -- pre-process data --
+tokenizer = BertTokenizer.from_pretrained(bert_path)   # initialise tokenizer
+input_ids, input_masks, input_types,  = [], [], []  # TODO: input char ids,  segment type ids,  attention mask
+labels = []
+maxlen = 22552     # max lengths of text from one documents

@@ -10,6 +10,7 @@ from tools import ml_tools, utils, formats
 dir_csv = 'outputs/labels_cleaned.csv'
 # =======================================================================================================================================
 
+# unpack dataframe
 df = pd.read_csv(dir_csv, encoding='utf-8')
 
 '''
@@ -21,11 +22,11 @@ wordvec_names, wordvec_counts = ml_tools.BoW(df['Content'].tolist())
 wordvec_names, wordvec_counts = ml_tools.tf_idf(df['Content'].tolist())
 
 
-# # -- classifion: logistic regression --
+# -- classifion: logistic regression --
 sizes = [0.5,0.6,0.7,0.8,0.9]
+accuracies = []
 num_epochs = 10
 
-accuracies = []
 for size in sizes:
     sum = 0
     start_time = time.time()
@@ -44,4 +45,6 @@ for size in sizes:
     print("--- %s seconds ---" % (time.time() - start_time))
 
 
-formats.scatter_plot(xvalue = sizes, yvalue = accuracies, xlabel = 'Training Size', ylabel = 'Accuracy', filepath = 'outputs/ifidf-lr-{}epochs.png'.format(num_epochs))
+# specify figure output path
+filepath = 'outputs/ifidf-lr-{}epochs.png'.format(num_epochs) # ** always change name **
+formats.scatter_plot(xvalue = sizes, yvalue = accuracies, xlabel = 'Training Size', ylabel = 'Accuracy', filepath)
