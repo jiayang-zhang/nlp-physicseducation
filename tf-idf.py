@@ -24,17 +24,12 @@ dir_csv = 'outputs/labels_cleaned.csv'
 df = pd.read_csv(dir_csv, encoding='utf-8')
 
 
-def tf_idf(corpus):
-    # performs tf_idf on the dataframe
-    v    = TfidfVectorizer()
-    x    = v.fit_transform(corpus)
-    s_m  = x.toarray()
-    return s_m
+
 
 # -- Bag of Words ---
 wordvec_names, wordvec_counts= ml_tools.BoW(df['Content'].tolist())
 # -- Feature extraction: TF-IDF ---
-X_t= tf_idf(df['Content'].tolist())
+X_t= ml_tools.tf_idf(df['Content'].tolist())
 
 # --- Classification: Naive Bayes classifier ----
 

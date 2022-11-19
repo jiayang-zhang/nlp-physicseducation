@@ -10,3 +10,13 @@ def bar_plot(xvalue = [0,0], yvalue = [0,0], xlabel = None, ylabel = None, filep
     plt.ylabel(ylabel)
     plt.savefig(filepath)
     return
+
+
+def scatter_plot(xvalue = [0,0], yvalue = [0,0], xlabel = None, ylabel = None, filepath = 'outputs/example.png'):
+    plt.figure()
+    plt.scatter(xvalue, yvalue, c=(0, 0, 0, 1), s=100)
+    plt.plot(xvalue, yvalue, linestyle='dashed', color=(0.3, 0.3, 0.45 ,.4))
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.savefig(filepath)
+    return

@@ -27,17 +27,20 @@ def BoW(corpus):
 
 def tf_idf(corpus):
     # performs tf_idf on the dataframe
-    v    = TfidfVectorizer()
-    x    = v.fit_transform(corpus)
-    s_m  = x.toarray()
-    return s_m
+    countvec    = TfidfVectorizer()
+    dtm    = countvec.fit_transform(corpus)
+
+    corpus_wordvec_names = countvec.get_feature_names()
+    corpus_wordvec_counts  = dtm.toarray()
+    
+    return corpus_wordvec_names, corpus_wordvec_counts
 
 # ================================================================================================
 # supervised classifion
 # ================================================================================================
 
 # -- Classification: logistic regression ---
-def logistic_regression(X_train, y_train, X_test):
+def logistic_regression(X_train, X_test, y_train):
 
     # Create an instance of LogisticRegression classifier
     lr = LogisticRegression(random_state=0)
