@@ -128,20 +128,17 @@ def xml_to_txt(dir_xml, dir_txt, filename, alltext = True, processtext = True):
     else:
         out = getparagraphs(dir_xml, filename)
 
+
     # write output to .txt file
-    if out == []: # if file is empty
-        print('WARNING: '+ filename + '.xml file is empty')
-        pass
-    else:
-        try:
-            with open(os.path.join(dir_txt, filename+'.txt'), 'w') as file:
-                content = ' '.join(out)
-                if processtext:
-                    file.write(preprocess(content))
-                else:
-                    file.write(content)
-        except FileNotFoundError:
-            print("The .txt directory does not exist")
+    try:
+        with open(os.path.join(dir_txt, filename+'.txt'), 'w') as file:
+            content = ' '.join(out)
+            if processtext:
+                file.write(preprocess(content))
+            else:
+                file.write(content)
+    except FileNotFoundError:
+        print("The .txt directory does not exist")
 
     return
 
@@ -179,11 +176,13 @@ def getall(dir_xml, filename):
 
     # read .xml file
     try:
-        with open(os.path.join(dir_xml, filename+'.tei.xml'), 'r', errors= 'ignore') as file: # parse xml as txt
+        with open(os.path.join(dir_xml, filename+'.tei.xml'), 'r') as file: # parse xml as txt
             content = file.read()
     except FileNotFoundError:
         print(("The .xml directory does not exist"))
     soup = bs(content, 'xml') # parse xml
+
+    # , errors= 'ignore'
 
     # extract every <p>  -- all paragraphs
     out = []
