@@ -1,11 +1,27 @@
+
+# feature extraction imports
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.linear_model import LogisticRegression
-from sklearn import metrics
 from sklearn.feature_extraction.text import TfidfVectorizer
+
+
+#machine learning model imports
+from sklearn.linear_model import LogisticRegression
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.ensemble import RandomForestClassifier
+
+
+
+#cross validation imports
+from sklearn.model_selection import KFold
+from sklearn.model_selection import cross_val_score
+
+#evaluation imports
+from sklearn import metrics
 
 # ================================================================================================
 # feature extraction
 # ================================================================================================
+#-------Bag-of-words------------
 def BoW(corpus):
     '''
     performs Bag of Words
@@ -25,8 +41,12 @@ def BoW(corpus):
 
     return corpus_wordvec_names, corpus_wordvec_counts
 
+
+#----------TF-IDF------------------
+'''
 def tf_idf(corpus):
     # performs tf_idf on the dataframe
+<<<<<<< HEAD
     countvec    = TfidfVectorizer()
     dtm    = countvec.fit_transform(corpus)
 
@@ -34,46 +54,69 @@ def tf_idf(corpus):
     corpus_wordvec_counts  = dtm.toarray()
 
     return corpus_wordvec_names, corpus_wordvec_counts
+'''
 
+=======
+    v    = TfidfVectorizer()
+    x    = v.fit_transform(corpus)
+    s_m  = x.toarray()
+    return s_m
+
+>>>>>>> 1030d7d3160183bb7f9f90d4c91c7f23a6c601d7
 # ================================================================================================
 # supervised classifion
 # ================================================================================================
 
 # -- Classification: logistic regression ---
-def logistic_regression(X_train, X_test, y_train):
-
+def logistic_regression(X_train, y_train):
     # Create an instance of LogisticRegression classifier
     lr = LogisticRegression(random_state=0)
-
     # Fit the model
     lr.fit(X_train, y_train)
-    y_test_predict = lr.predict(X_test)
 
-    return  y_test_predict
+    return lr.predict # returns classifier model
+
+# -- Classification: Naive Bayes ------------
+
+def naive_bayes(X_train, y_train, X_test, y_test):
+    nb = MultinomialNB().fit(X_train, y_train)
+    predictions = nb.predict(X_test) # array of predicted labels
+    acc_score = metrics.accuracy_score(y_test, predictions) # single accuracy score
+    return predictions
+
+# -- Classification: Random forest ----------
+
+def random_forest(X_train, y_train, X_test, y_test):
+    rf = RandomForestClassifier(max_depth= None, random_state = 0).fit(X_train, y_train)
+    predictions = rf.predict(X_test)
+    return predictions
+
 
 # ================================================================================================
-# evaluation
+# EVALUATION
 # ================================================================================================
 
-def sanity_check(X_test, y_test, y_test_predict, printWrong=True):
+def sanity_check(model, X_input, y_input, printWrong=True):
+    y_predict = model(X_input)
 
     # accuracy score
-    accuracy = metrics.accuracy_score(y_test, y_test_predict)
+    accuracy = metrics.accuracy_score(y_input, y_predict)
 
     if printWrong:
-        flag = True
-        for i in range(len(X_test)):
-            if y_test[i] != y_test_predict[i]:
-                print('wrong prediction:', y_test[i], y_test_predict[i])
-                flag = False
-        print(flag)
+        # flag = True
+        # for i in range(len(X_input)):
+        #     if y_input[i] != y_predict[i]:
+        #         print('wrong prediction:', y_input[i], y_predict[i])
+        #         flag = False
+        # print(flag)
 
-        print('Manual labels:', y_test,'\n','Predicted labels:',y_test_predict)
+        # print('Manual labels:', y_input,'\n','Predicted labels:',y_predict)
 
         print("LogisticRegression Accuracy %.3f" %accuracy)
 
     return accuracy
 
+<<<<<<< HEAD
 
 
 
@@ -114,3 +157,24 @@ def b_metrics(preds, labels):
   return b_accuracy, b_precision, b_recall, b_specificity
 
 # reference: https://towardsdatascience.com/fine-tuning-bert-for-text-classification-54e7df642894
+=======
+def accuracy_score(y_test, predictions):
+    # accuracy scores
+    acc_score   = metrics.accuracy_score(y_test, predictions)
+    return acc_score
+
+#============================================================================================================
+# CROSS-VALIDATION: KFOLD
+#============================================================================================================
+
+def kfold(model,x, df_y, n_iterations):
+    '''
+    returns
+    '''
+    kf = KFold(n_splits= n_iterations)
+    #df_y = df['ReasoningLevel'].tolist()
+    results = cross_val_score(model, x, df_y, cv = kf)
+    return results
+
+
+>>>>>>> 1030d7d3160183bb7f9f90d4c91c7f23a6c601d7

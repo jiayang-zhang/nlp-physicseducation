@@ -140,17 +140,17 @@ def pre_process_text(directory):
 def dframe(arr1, arr2):
     df = pd.DataFrame({'1': arr1, '2': arr2})
     return df
-#%%
+
 #pre-processed text
 pptxt = pre_process_text(dir1)
 
 
-#%%
+
 # feature extraction
 tfidf_text = tfidf(pptxt)
 print(tfidf_text)
 
-#%%
+
 #dataset = pd.DataFrame({'labels': y, 'Documents': tfidf_text})
 #print(dataset)
 #%%

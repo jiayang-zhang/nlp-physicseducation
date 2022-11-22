@@ -2,6 +2,7 @@ import os
 import pandas as pd
 pd.set_option('max_colu', 10)
 import time
+import numpy as np
 from sklearn.model_selection import train_test_split
 
 from tools import ml_tools, utils, formats
@@ -11,7 +12,7 @@ dir_csv = 'outputs/labels_cleaned.csv'
 # =======================================================================================================================================
 # * set how you would like it to be trained *
 labels = ['ArgumentLevel','ReasoningLevel'] # 'ArgumentLevel', 'ReasoningLevel'
-features = 'ifidf' #'bow', 'ifidf'
+features = ['ifidf'] #'bow', 'ifidf'
 num_epochs = 1
 train_sizes = [0.5,0.6,0.7,0.8,0.9] # proportion of training data
 # =======================================================================================================================================
@@ -37,9 +38,13 @@ for label in labels:
 # -- classifion: logistic regression --
 def lr_accuracy_trainsize_plot(label, feature, num_epochs, train_sizes):
     accuracies = []
+    accuracies_sd = []
     for size in train_sizes:
         sum = 0
         start_time = time.time()
+
+
+        dummy = []
         for epoch in range(num_epochs):
             # split train/test data
             X_train, X_test, y_train, y_test = train_test_split(wordvec_counts, df[label].tolist(), train_size = size)
@@ -49,13 +54,15 @@ def lr_accuracy_trainsize_plot(label, feature, num_epochs, train_sizes):
             # Accuracy
             accuracy_score = ml_tools.sanity_check(X_test, y_test, y_test_predict, printWrong=False)
             # print("Epoch {}/{}, Accuracy: {:.3f}".format(epoch+1,num_epochs, accuracy_score))
-            sum += accuracy_score
-        accuracies.append(sum/num_epochs)
-        print('average accuracy score:', sum/num_epochs)
+            dummy.append(accuracy_score)
+
+        accuracies.append(np.sum(dummy)/num_epochs)
+        accuracies_sd.append(np.std(dummy))
+        print('average accuracy score:', np.sum(dummy)/num_epochs)
         print("--- %s seconds ---" % (time.time() - start_time))
 
 
     # specify figure output path
     filepath = 'outputs/{}-lr-{}epochs-{}.png'.format(feature, num_epochs, label) # ** always change name **
-    formats.scatter_plot(xvalue = train_sizes, yvalue = accuracies, xlabel = 'Training Size', ylabel = 'Accuracy', filepath = filepath)
+    formats.scatter_plot(xvalue = train_sizes, yvalue = accuracies, yerr = accuracies_sd, xlabel = 'Training Size', ylabel = 'Accuracy', filepath = filepath)
     return
