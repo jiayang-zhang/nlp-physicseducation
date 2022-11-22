@@ -13,4 +13,9 @@ from tools import utils
 
 
 #  empty xml file
-utils.xml_to_txt('/Users/jiayangzhang/Library/CloudStorage/OneDrive-ImperialCollegeLondon/year4/anonymised_reports/year_1_2017/cycle_1/xml', '/Users/jiayangzhang/Library/CloudStorage/OneDrive-ImperialCollegeLondon/year4/anonymised_reports/year_1_2017/cycle_1/txt', 'GS_KGL587_Redacted', alltext = True, processtext = True)
+# utils.xml_to_txt('/Users/jiayangzhang/Library/CloudStorage/OneDrive-ImperialCollegeLondon/year4/anonymised_reports/year_1_2017/cycle_1/xml', '/Users/jiayangzhang/Library/CloudStorage/OneDrive-ImperialCollegeLondon/year4/anonymised_reports/year_1_2017/cycle_1/txt', 'GS_KGL587_Redacted', alltext = True, processtext = True)
+
+
+# check Anaconda bit
+# import platform
+# print(platform.architecture())

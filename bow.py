@@ -12,7 +12,7 @@ dir_csv = 'outputs/labels_cleaned.csv'
 # * set how you would like it to be trained *
 labels = ['ArgumentLevel','ReasoningLevel'] # 'ArgumentLevel', 'ReasoningLevel'
 features = 'ifidf' #'bow', 'ifidf'
-num_epochs = 10
+num_epochs = 1
 train_sizes = [0.5,0.6,0.7,0.8,0.9] # proportion of training data
 # =======================================================================================================================================
 
