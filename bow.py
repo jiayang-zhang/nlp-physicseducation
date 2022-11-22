@@ -12,27 +12,13 @@ dir_csv = 'outputs/labels_cleaned.csv'
 # =======================================================================================================================================
 # * set how you would like it to be trained *
 labels = ['ArgumentLevel','ReasoningLevel'] # 'ArgumentLevel', 'ReasoningLevel'
-features = ['ifidf'] #'bow', 'ifidf'
-num_epochs = 1
+features = ['ifidf','bow'] #'bow', 'ifidf'
+num_epochs = 10
 train_sizes = [0.5,0.6,0.7,0.8,0.9] # proportion of training data
 # =======================================================================================================================================
 
 # unpack dataframe
 df = pd.read_csv(dir_csv, encoding='utf-8')
-
-# -- Feature extraction: TF-IDF ---
-if feature ==  'ifidf':
-    wordvec_names, wordvec_counts = ml_tools.tf_idf(df['Content'].tolist())
-# -- Feature extraction: Bag of Words ---
-elif feature == 'bow':
-    wordvec_names, wordvec_counts = ml_tools.BoW(df['Content'].tolist())
-
-
-
-# loop over labels, feature extractions
-for label in labels:
-    for feature in features:
-        lr_accuracy_trainsize_plot(label, feature, num_epochs, train_sizes)
 
 
 # -- classifion: logistic regression --
@@ -66,3 +52,20 @@ def lr_accuracy_trainsize_plot(label, feature, num_epochs, train_sizes):
     filepath = 'outputs/{}-lr-{}epochs-{}.png'.format(feature, num_epochs, label) # ** always change name **
     formats.scatter_plot(xvalue = train_sizes, yvalue = accuracies, yerr = accuracies_sd, xlabel = 'Training Size', ylabel = 'Accuracy', filepath = filepath)
     return
+
+
+
+# loop over labels, feature extractions
+for label in labels:
+    for feature in features:
+
+
+        # -- Feature extraction: TF-IDF ---
+        if feature ==  'ifidf':
+            wordvec_names, wordvec_counts = ml_tools.tf_idf(df['Content'].tolist())
+        # -- Feature extraction: Bag of Words ---
+        elif feature == 'bow':
+            wordvec_names, wordvec_counts = ml_tools.BoW(df['Content'].tolist())
+
+
+        lr_accuracy_trainsize_plot(label, feature, num_epochs, train_sizes)
