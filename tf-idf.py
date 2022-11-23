@@ -1,6 +1,7 @@
 #%%
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 
 # feature extraction imports
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -51,13 +52,12 @@ y_b = df['ReasoningLevel'].tolist()
 # -- Feature extraction: TF-IDF ---
 X_t = tf_idf(df['Content'].tolist())
 y_t = df['ReasoningLevel']
-
+#%%
 
 # --- Classification: Naive Bayes classifier ----
 no_of_iterations = 10
-kf = KFold(n_splits= no_of_iterations)
-
-#%%
+acc_nb_val = []
+nb_xlabels = []
 
 # --- classify using bow feature extraction -----
 # leave out method
@@ -69,7 +69,9 @@ for i in range(no_of_iterations):
     predicted_b = clf_b.predict(X_test_b)
     acc_score_l =  metrics.accuracy_score(y_test_b, predicted_b)
     leave_out_array.append(acc_score_l)
-    iteration_number.append(i)
+mean_lo_values = (np.sum(leave_out_array))/ (len(leave_out_array))
+acc_nb_val.append(mean_lo_values)
+nb_xlabels.append('LO - BOW')
 
 mean_lo_values = sum(leave_out_array)/ len(leave_out_array)
 print('array of leave out accuracy values', leave_out_array)
@@ -94,86 +96,78 @@ plt.xlabel('Iteration number')
 plt.legend()
 plt.grid()
 
-#%%
+# ------- NB, BoW, KFold ------
 
-# --- classify using tf-idf feature extraction---
+kf = KFold(n_splits= no_of_iterations)
+model       = MultinomialNB()
+result = cross_val_score(model, wordvec_counts, df['ReasoningLevel'].tolist(), cv = kf)
+acc_nb_val.append(result.mean())
+nb_xlabels.append('KFold - BoW')
 
 
-# NB,  TF-IDF, KFold
+# ------ NB,  TF-IDF, KFold -----
 array = []
 for train_index, test_index in kf.split(X_t):
     #print('TRAIN:', train_index, 'TEST:', test_index)
     X_train_t, X_test_t = X_t[train_index], X_t[test_index]
     y_train_t, y_test_t = y_t[train_index], y_t[test_index]
     clf_t      = MultinomialNB().fit(X_train_t, y_train_t)
-    predicted_t = clf_b.predict(X_test_t)
+    predicted_t = clf_t.predict(X_test_t)
     acc_score = metrics.accuracy_score(y_test_t, predicted_t)
     array.append(acc_score)
 
-average_accuracy = sum(array)/len(array)
-print('Array of accuracy values:', array)
-print('Average accuracy - tfidf:', average_accuracy)
+average_accuracy = np.sum(array)/(len(array))
+acc_nb_val.append(average_accuracy)
+nb_xlabels.append('KFold -T')
 
-
-# graph of k fold for tidf vs BoW 
-plt.plot(iteration_number, result,'x')
-plt.plot(iteration_number,result,  '--', label = 'BoW')
-plt.plot(iteration_number, array, 'o')
-plt.plot(iteration_number, array, '--', label = 'tf-idf')
-plt.title('NB, CV-Kfold: BoW vs TF-IDF')
-plt.ylabel('Accuracy value')
-plt.xlabel('Iteration number')
-plt.legend()
+# ---- RF: Plot of the accuracy vs using different cross validation/ feature extraction methods----
+plt.plot(nb_xlabels, acc_nb_val, 'x')
 plt.grid()
-
-#%%
-
-print('MultinomialNB Accuracy, using BOW feature extraction:', metrics.accuracy_score(y_test_b, predicted_b))
-print('MultinomialNB Accuracy, using TF-IDF feature extraction:', metrics.accuracy_score(y_test_t, predicted_t))
-
-#%%
+plt.xlabel('cross validation technique for each FE method')
+plt.ylabel('Accuracy scores')
+plt.title('NB: Comparison of accuracy values due to different cross validation techniqes')
 
 #---- Classification: Random Forest ---------
 from sklearn.ensemble import RandomForestClassifier
 X_train_b, X_test_b, y_train_b, y_test_b = train_test_split(wordvec_counts, y_b , train_size = 0.8)
-X_train_b, X_test_b, y_train_b, y_test_b = train_test_split(X_t, y_t , train_size = 0.8)
+X_train_t, X_test_t, y_train_t, y_test_t = train_test_split(X_t, y_t , train_size = 0.8)
+
+acc_rf_score = []
+label = ['BoW', 'TF-IDF', 'KFold - BoW', 'KFold - T']
 
 # --- RF: USING BoW feature extraction ------
 clf_rf_b            = RandomForestClassifier(max_depth= None, random_state = 0).fit(wordvec_counts, y_b)
 predicted_rf_b      = clf_rf_b.predict(X_test_b)
 accuracy_score_rf_b = metrics.accuracy_score(y_test_b, predicted_rf_b)
-print(accuracy_score_rf_b)
+acc_rf_score.append(accuracy_score_rf_b)
+print('BoW-RF', accuracy_score_rf_b)
 
 
 # --- RF: USING tf-idf feature extraction -----
 clf_rf_t            = RandomForestClassifier(max_depth= None, random_state = 0).fit(X_t, y_t)
 predicted_rf_t      = clf_rf_t.predict(X_test_t)
+print(predicted_b)
 accuracy_score_rf_t = metrics.accuracy_score(y_test_t, predicted_rf_t)
-print(accuracy_score_rf_t)
-
+print('TF-IDF - RF',accuracy_score_rf_t)
+summ =+ accuracy_score_rf_t
+acc_rf_score.append(accuracy_score_rf_t)
 
 # --- RF, BoW, KFold -----
 model_rf            = RandomForestClassifier(max_depth= None, random_state = 0)
 result_rf_b         = cross_val_score(model_rf, wordvec_counts, y_b, cv = kf)
-print(result_rf_b)
-print('Avg accuracy - Bo W, RF {}'.format(result_rf_b.mean()))
+acc_rf_score.append(result_rf_b.mean())
+print('Avg accuracy - Bo W, RF, kf {}'.format(result_rf_b.mean()))
 
+#------ RF, TF-IDF, KFold -----
+result_rf_t        = cross_val_score(model_rf, X_t, y_t, cv = kf)
+acc_rf_score.append(result_rf_t.mean())
+print('Avg accuracy - Bo W, RF, kf {}'.format(result_rf_t.mean()))
 
-#%%
-'''
------ KEY INFORMATION! --------
-For the train_test_split the documentation shows
- 1. random_state = 42 | controls the shuffling applied in data before applying the split#
-link: https://scikit-learn.org/stable/glossary.html#term-random_state
- 2. shuffle = True | you can shuffle before splitting 
- 3. stratify = 
+# ---- RF: Plot of the accuracy vs using different cross validation/ feature extraction methods----
+plt.plot(label, acc_rf_score, 'x')
+plt.plot(label, acc_rf_score, '--')
+plt.title('RF: accuracy score comparison')
+plt.xlabel('feature extraction/ crossvalidation technique')
+plt.ylabel('Accuracy value')
+plt.grid()
 
-More on the different functions to use to split shuffle and stratify data
- https://scikit-learn.org/stable/modules/cross_validation.html#stratification
-
- Stratified k fold
- stratified shuffle split
-
- best source, used it for tfidf kfold training
- https://neptune.ai/blog/cross-validation-in-machine-learning-how-to-do-it-right
-'''
