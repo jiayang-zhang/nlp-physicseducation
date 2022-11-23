@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
-plt.style.use(['science', 'ieee'])
-
+#plt.style.use('ieee')
+plt.style.available
 
 def bar_plot(xvalue = [0,0], yvalue = [0,0], xlabel = None, ylabel = None, filepath = 'outputs/example.png'):
     plt.figure()
