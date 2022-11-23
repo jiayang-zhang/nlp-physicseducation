@@ -59,7 +59,6 @@ def lr_accuracy_trainsize_plot(label, feature, num_epochs, train_sizes):
 for label in labels:
     for feature in features:
 
-
         # -- Feature extraction: TF-IDF ---
         if feature ==  'ifidf':
             wordvec_names, wordvec_counts = ml_tools.tf_idf(df['Content'].tolist())
