@@ -1,11 +1,12 @@
-import os
+#%%
+
 import pandas as pd
 pd.set_option('max_colu', 10)
+
 import time
 import numpy as np
 from sklearn.model_selection import train_test_split
-
-from tools import ml_tools, utils, formats
+from tools import ml_tools, formats
 
 # =======================================================================================================================================
 dir_csv = 'outputs/labels_cleaned.csv'
@@ -20,7 +21,7 @@ train_sizes = [0.5,0.6,0.7,0.8,0.9] # proportion of training data
 # unpack dataframe
 df = pd.read_csv(dir_csv, encoding='utf-8')
 
-
+#%%
 # -- classifion: logistic regression --
 def lr_accuracy_trainsize_plot(label, feature, num_epochs, train_sizes):
     accuracies = []
@@ -53,8 +54,6 @@ def lr_accuracy_trainsize_plot(label, feature, num_epochs, train_sizes):
     formats.scatter_plot(xvalue = train_sizes, yvalue = accuracies, yerr = accuracies_sd, xlabel = 'Training Size', ylabel = 'Accuracy', filepath = filepath)
     return
 
-
-
 # loop over labels, feature extractions
 for label in labels:
     for feature in features:
@@ -65,6 +64,6 @@ for label in labels:
         # -- Feature extraction: Bag of Words ---
         elif feature == 'bow':
             wordvec_names, wordvec_counts = ml_tools.BoW(df['Content'].tolist())
-
-
         lr_accuracy_trainsize_plot(label, feature, num_epochs, train_sizes)
+
+# %%

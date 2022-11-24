@@ -1,13 +1,20 @@
+#%%
 from bs4 import BeautifulSoup as bs
 import os
 import string
 import pandas as pd
 import numpy as np
+pd.set_option('max_colu', 10)
 
 import nltk
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords, wordnet
 from nltk.stem import WordNetLemmatizer
+from sklearn.model_selection import train_test_split
+import time
+
+
+#%%
 '''
 nltk.download('punkt')
 nltk.download('stopwords')
@@ -15,6 +22,7 @@ nltk.download('wordnet')
 nltk.download('omw-1.4')
 nltk.download('averaged_perceptron_tagger')
 '''
+
 # ========================================================================================
 # for .txt files
 # ========================================================================================
@@ -104,7 +112,7 @@ def get_wordnet_pos(word):
 
     return tag_dict.get(tag, wordnet.NOUN)
 
-
+#%%
 # ========================================================================================
 # for .xml files
 # ========================================================================================
@@ -230,3 +238,34 @@ def build_labels_dataframe(dir_xlsx) -> pd.DataFrame:
         df_labels = df_labels.replace(i, i.lower())
 
     return df_labels
+
+#===================================================================================================================================================================================================
+  #PICKLE FILES
+#===================================================================================================================================================================================================
+'''
+how to use:
+--> the machine learning algorithm could collect your results into a data frame 
+--> pickle data file to Pickledfiles using function: pickle_save_file
+--> unpickle the data file using function: pickle_load_file
+
+'''
+
+import pickle
+
+path = '/Users/EfiaA/OneDrive - Imperial College London/Imperial academic work/University life/Y4/MSci project/Project_Coding/anonymised_reports/anonymised_reports/year_1_2017/cycle_1/Pickledfiles'
+
+def pickle_load_file(filename, folder='data') -> pd.DataFrame:
+    res = None
+    with open(path.join(folder,filename),'rb') as file:
+        res = pickle.load(file)
+    return res
+
+def pickle_save_file(dataframe ,filename, foldername):
+    if not path.exists(foldername):
+        os.mkdir(foldername)
+    with open(path.join(foldername, filename),'wb') as file:
+        pickle.dump(dataframe,file)
+    
+
+
+
