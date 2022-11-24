@@ -81,7 +81,7 @@ def naive_bayes(X_train, y_train, X_test, y_test):
     nb = MultinomialNB().fit(X_train, y_train)
     predictions = nb.predict(X_test) # array of predicted labels
     acc_score = metrics.accuracy_score(y_test, predictions) # single accuracy score
-    return predictions, acc_score
+    return predictions
 
 # -- Classification: Random forest ----------
 
@@ -89,7 +89,7 @@ def random_forest(X_train, y_train, X_test, y_test):
     rf = RandomForestClassifier(max_depth= None, random_state = 0).fit(X_train, y_train)
     predictions = rf.predict(X_test)
     acc_score = metrics.accuracy_score(y_test, predictions) # single accuracy score
-    return predictions,acc_score
+    return predictions
 
 
 # ================================================================================================
