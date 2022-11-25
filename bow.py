@@ -1,12 +1,11 @@
-#%%
-
 import pandas as pd
 pd.set_option('max_colu', 10)
 
 import time
 import numpy as np
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split   # conda install scikit-learn
 from tools import ml_tools, formats
+
 
 # =======================================================================================================================================
 dir_csv = 'outputs/labels_cleaned.csv'
@@ -14,14 +13,13 @@ dir_csv = 'outputs/labels_cleaned.csv'
 # * set how you would like it to be trained *
 labels = ['ArgumentLevel','ReasoningLevel'] # 'ArgumentLevel', 'ReasoningLevel'
 features = ['ifidf','bow'] #'bow', 'ifidf'
-num_epochs = 10
+num_epochs = 3
 train_sizes = [0.5,0.6,0.7,0.8,0.9] # proportion of training data
 # =======================================================================================================================================
 
 # unpack dataframe
 df = pd.read_csv(dir_csv, encoding='utf-8')
 
-#%%
 # -- classifion: logistic regression --
 def lr_accuracy_trainsize_plot(label, feature, num_epochs, train_sizes):
     accuracies = []
@@ -65,5 +63,3 @@ for label in labels:
         elif feature == 'bow':
             wordvec_names, wordvec_counts = ml_tools.BoW(df['Content'].tolist())
         lr_accuracy_trainsize_plot(label, feature, num_epochs, train_sizes)
-
-# %%
