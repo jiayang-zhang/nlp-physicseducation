@@ -7,8 +7,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.ensemble import RandomForestClassifier
-
-
+from sklearn.model_selection import train_test_split
 
 #cross validation imports
 from sklearn.model_selection import KFold
@@ -16,7 +15,8 @@ from sklearn.model_selection import cross_val_score
 
 #evaluation imports
 from sklearn import metrics
-
+import time
+import numpy as np
 # ================================================================================================
 # feature extraction
 # ================================================================================================
@@ -76,15 +76,15 @@ def logistic_regression(X_train, X_test, y_train):
 
 # -- Classification: Naive Bayes ------------
 
-def naive_bayes(X_train, y_train, X_test, y_test):
-    nb = MultinomialNB().fit(X_train, y_train)
+def naive_bayes(X_train, X_test, y_train, y_test):
+    nb = MultinomialNB().fit(X_train, np.asarray(y_train))
     predictions = nb.predict(X_test) # array of predicted labels
     acc_score = metrics.accuracy_score(y_test, predictions) # single accuracy score
     return predictions
 
 # -- Classification: Random forest ----------
 
-def random_forest(X_train, y_train, X_test, y_test):
+def random_forest(X_train,  X_test, y_train,y_test):
     rf = RandomForestClassifier(max_depth= None, random_state = 0).fit(X_train, y_train)
     predictions = rf.predict(X_test)
     acc_score = metrics.accuracy_score(y_test, predictions) # single accuracy score
@@ -144,21 +144,46 @@ def lr_accuracy_trainsize_plot_general(classifier, x, y, label, feature, num_epo
         for epoch in range(num_epochs):
             # split train/test data
             X_train, X_test, y_train, y_test = train_test_split(x, y, train_size = size)
+            #print('X_train',X_train)
+            #print('y_train', y_train)
+           
             # train model + prediction
             y_test_predict = classifier(X_train, X_test, y_train, y_test)
-
+            #print('predictions:', y_test_predict)
             # Accuracy
             accuracy_score = sanity_check(X_test, y_test, y_test_predict, printWrong=False)
-            # print("Epoch {}/{}, Accuracy: {:.3f}".format(epoch+1,num_epochs, accuracy_score))
+            #print("Epoch {}/{}, Accuracy: {:.3f}".format(epoch+1,num_epochs, accuracy_score))
             dummy.append(accuracy_score)
 
         accuracies.append(np.sum(dummy)/num_epochs)
         accuracies_sd.append(np.std(dummy))
-        print('average accuracy score:', np.sum(dummy)/num_epochs)
-        print("--- %s seconds ---" % (time.time() - start_time))
+        #print('average accuracy score:', np.sum(dummy)/num_epochs)
+        #print("--- %s seconds ---" % (time.time() - start_time))
+    return accuracies, accuracies_sd
 
 
-    # specify figure output path
-    filepath = 'outputs/{}-lr-{}epochs-{}.png'.format(feature, num_epochs, label) # ** always change name **
-    scatter_plot(xvalue = train_sizes, yvalue = accuracies, yerr = accuracies_sd, xlabel = 'Training Size', ylabel = 'Accuracy', filepath = filepath)
-    return
+def iterations_of_ml_models(classifier, x, y, label, feature, num_epochs):
+    accuracies = []
+    accuracies_sd = []
+    sum = 0
+    start_time = time.time()
+
+    dummy = []
+    for epoch in range(num_epochs):
+        # split train/test data
+        X_train, X_test, y_train, y_test = train_test_split(x, y, train_size = size)
+        #print('X_train',X_train)
+        #print('y_train', y_train)
+        
+        # train model + prediction
+        y_test_predict = classifier(X_train, X_test, y_train, y_test)
+        #print('predictions:', y_test_predict)
+        # Accuracy
+        accuracy_score = sanity_check(X_test, y_test, y_test_predict, printWrong=False)
+        #print("Epoch {}/{}, Accuracy: {:.3f}".format(epoch+1,num_epochs, accuracy_score))
+        dummy.append(accuracy_score)
+
+    accuracies.append(np.sum(dummy)/num_epochs)
+    accuracies_sd.append(np.std(dummy))
+
+    return accuracies, accuracies_sd

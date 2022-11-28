@@ -252,20 +252,24 @@ how to use:
 
 import pickle
 
-path = '/Users/EfiaA/OneDrive - Imperial College London/Imperial academic work/University life/Y4/MSci project/Project_Coding/anonymised_reports/anonymised_reports/year_1_2017/cycle_1/Pickledfiles'
+def save_as_pickle_file(dataframe, filename):
+    '''
+    dataframe: pandas dataframe
+    filename: string name
+    '''
+    format = 'pkl'
+    dir_name = r'C:\Users\EfiaA\OneDrive - Imperial College London\Imperial academic work\University life\Y4\MSci project\Project_Coding\nlp-physicseducation\Pickledfiles'
+    path1 = os.path.join(dir_name,filename + "." + format)
+    dataframe.to_pickle(path1)
+    return
 
-def pickle_load_file(filename, folder='data') -> pd.DataFrame:
-    res = None
-    with open(path.join(folder,filename),'rb') as file:
-        res = pickle.load(file)
-    return res
-
-def pickle_save_file(dataframe ,filename, foldername):
-    if not path.exists(foldername):
-        os.mkdir(foldername)
-    with open(path.join(foldername, filename),'wb') as file:
-        pickle.dump(dataframe,file)
-    
-
-
+def load_pickle_file_to_df(filename):
+    '''
+    filename: string file name
+    '''
+    format = 'pkl'
+    dir_name = r'C:\Users\EfiaA\OneDrive - Imperial College London\Imperial academic work\University life\Y4\MSci project\Project_Coding\nlp-physicseducation\Pickledfiles'
+    path1 = os.path.join(dir_name,filename + "." + format)
+    unpickled_dataframe = pd.read_pickle(path1)
+    return unpickled_dataframe
 
