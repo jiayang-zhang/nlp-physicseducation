@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-
 # feature extraction imports
 from sklearn.feature_extraction.text import TfidfVectorizer
 
@@ -11,9 +10,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from tools import utils, ml_tools, formats
-import time
 
-#%%
 
 # ================================================================================================
 #path = '/Users/jiayangzhang/Library/CloudStorage/OneDrive-ImperialCollegeLondon/year4/nlp-physicseducation/testfiles'
@@ -31,56 +28,65 @@ df_labels = utils.build_labels_dataframe('data/labels.xlsx')
 df = pd.merge(df_files, df_labels, left_on='StudentID', right_on='StudentID')      # merged dataframe: StudentID, Content, ArgumentLevel, ReasoningLevel
 
 #%%
-def tf_idf(corpus):
-    # performs tf_idf on the dataframe
-    v    = TfidfVectorizer()
-    x    = v.fit_transform(corpus)
-    s_m  = x.toarray()
-    return s_m
-
-    
-# -- Bag of Words ---
-wordvec_names, wordvec_counts= ml_tools.BoW(df['Content'].tolist())
-y_b = df['ReasoningLevel'].tolist()
-
-
-# -- Feature extraction: TF-IDF ---
-X_t = tf_idf(df['Content'].tolist())
-y_t = df['ReasoningLevel']
-
-# --- Classification: Naive Bayes classifier ----
-X_train_b, X_test_b, y_train_b, y_test_b = train_test_split(wordvec_counts, y_b , train_size = 0.8)
-X_train_t, X_test_t, y_train_t, y_test_t = train_test_split(X_t, y_t , train_size = 0.8)
-
-# ------- NB, BoW------
-nb_bow = ml_tools.naive_bayes(X_train_b, y_train_b, X_test_b, y_test_b)
-
-# ------ NB,  TF-IDF-----
-nb_tfidf = ml_tools.naive_bayes(X_train_t, y_train_t, X_test_t, y_test_t)
-
-# --- RF: USING BoW feature extraction ------
-rf_bow = ml_tools.random_forest(X_train_t, y_train_t, X_test_t, y_test_t )
-
-# --- RF: USING tf-idf feature extraction -----
-
-rf_tfidf = ml_tools.random_forest(X_train_t, y_train_t, X_test_t, y_test_t )
-
-#%%
 labels = ['ArgumentLevel','ReasoningLevel'] # 'ArgumentLevel', 'ReasoningLevel'
 features = ['ifidf','bow'] #'bow', 'ifidf'
-num_epochs = 10
+num_epochs = 40
 train_sizes = [0.5,0.6,0.7,0.8,0.9] # proportion of training data
+'''
+What is the accuracies?
+the accuracy arra contains 4 lists corresponding to each feature extraction technique used
+each list contains 5 accuracy values corresponding to the training size used
+each single value is the average accuracy score for 10 or more iterations (epoch is defined by the user)
+'''
 
-# %%
-
-# loop over labels, feature extractions
+# loop over labels for training size, feature extractions: Naive bayes
+accuracies = []
+accuracies_sd = []
+feature2 = []
 for label in labels:
     for feature in features:
         # -- Feature extraction: TF-IDF ---
         if feature ==  'ifidf':
             wordvec_names, wordvec_counts = ml_tools.tf_idf(df['Content'].tolist())
+            print('tfidf')
+            t = ml_tools.lr_accuracy_trainsize_plot_general(ml_tools.naive_bayes, wordvec_counts, df[label].tolist(),label, feature, num_epochs, train_sizes)
+            accuracies.append(t[0])
+            accuracies_sd.append(t[1])
+            feature2.append(feature)
         # -- Feature extraction: Bag of Words ---
         elif feature == 'bow':
             wordvec_names, wordvec_counts = ml_tools.BoW(df['Content'].tolist())
-        formats.lr_accuracy_trainsize_plot_general(ml_tools.naive_bayes, wordvec_counts, df[label].tolist(),label, feature, num_epochs, train_sizes)
+            print('bow')
+            b = ml_tools.lr_accuracy_trainsize_plot_general(ml_tools.naive_bayes, wordvec_counts, df[label].tolist(),label, feature, num_epochs, train_sizes)
+            accuracies.append(b[0])
+            accuracies_sd.append(b[1])
+            feature2.append(feature)
+
+
 # %%
+#------- Dataframe  --------
+df1 = pd.DataFrame({'feature extraction':feature2,'accuracy':accuracies, 'standdev': accuracies_sd})
+
+#----- pickled dataframe
+utils.save_as_pickle_file(df1,'testnb')
+#%%
+
+unpickle_df = utils.load_pickle_file_to_df('testnb')
+
+
+#%%
+# --- inidividual graphs --------
+
+for i in range(len(accuracies)):
+    if i%2 == 0:
+        filepath = 'outputs/{}-NB-{}epochs-{}.png'.format(feature[0], num_epochs, label[0]) # ** always change name **
+        formats.scatter_plot(xvalue = train_sizes, yvalue = accuracies[i], yerr = accuracies_sd[i], xlabel = 'Training Size', ylabel = 'Accuracy', filepath = filepath)
+    else: 
+        filepath = 'outputs/{}-NB-{}epochs-{}.png'.format(feature[1], num_epochs, label[1]) # ** always change name **
+        formats.scatter_plot(xvalue = train_sizes, yvalue = accuracies[i], yerr = accuracies_sd[i], xlabel = 'Training Size', ylabel = 'Accuracy', filepath = filepath)
+
+
+#%%
+#    #--- collective graphs ---
+#    filepath = 'outputs/{}-NB-{}epochs-{}.png'.format(feature[1], num_epochs, label[1]) # ** always change name **
+#    formats.scatter_plot_asone(xvalue = train_sizes, yvalue = accuracies, yerr = accuracies_sd, xlabel = 'Training Size', ylabel = 'Accuracy', filepath = filepath, feature = features, label = labels)
