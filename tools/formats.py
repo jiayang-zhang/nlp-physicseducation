@@ -1,18 +1,21 @@
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
 import time
 import pandas as pd
-#plt.style.use(['science', 'ieee'])
-plt.style.use('seaborn-notebook')
-plt.style.available
+plt.style.use(['science', 'ieee'])
+# plt.style.use('seaborn-notebook')
+# plt.style.available
+
 
 
 def bar_plot(xvalue = [0,0], yvalue = [0,0], xlabel = None, ylabel = None, filepath = 'outputs/example.png'):
-    plt.figure()
-    plt.bar(xvalue, yvalue, color=(0.3, 0.3, 0.45 ,.4), edgecolor=(0, 0, 0, 1))
+    ax = plt.figure().gca()
+    ax.yaxis.set_major_locator(MaxNLocator(integer=True))
+    ax.bar(xvalue, yvalue, color=(0.3, 0.3, 0.45 ,.4), edgecolor=(0, 0, 0, 1))
     # plt.grid(ls= ':', color='#6e6e6e', lw=0.5);
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
-    plt.savefig(filepath)
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    ax.figure.savefig(filepath)
     return
 
 

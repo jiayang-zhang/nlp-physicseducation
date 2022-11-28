@@ -12,6 +12,7 @@ from nltk.corpus import stopwords, wordnet
 from nltk.stem import WordNetLemmatizer
 from sklearn.model_selection import train_test_split
 import time
+import pickle
 
 
 #%%
@@ -138,15 +139,19 @@ def xml_to_txt(dir_xml, dir_txt, filename, alltext = True, processtext = True):
 
 
     # write output to .txt file
-    try:
-        with open(os.path.join(dir_txt, filename+'.txt'), 'w') as file:
-            content = ' '.join(out)
-            if processtext:
-                file.write(preprocess(content))
-            else:
-                file.write(content)
-    except FileNotFoundError:
-        print("The .txt directory does not exist")
+    if out == []: # if file is empty
+        print('WARNING: '+ filename + '.xml file is empty')
+        pass
+    else:
+        try:
+            with open(os.path.join(dir_txt, filename+'.txt'), 'w') as file:
+                content = ' '.join(out)
+                if processtext:
+                    file.write(preprocess(content))
+                else:
+                    file.write(content)
+        except FileNotFoundError:
+            print("The .txt directory does not exist")
 
     return
 
@@ -244,13 +249,11 @@ def build_labels_dataframe(dir_xlsx) -> pd.DataFrame:
 #===================================================================================================================================================================================================
 '''
 how to use:
---> the machine learning algorithm could collect your results into a data frame 
+--> the machine learning algorithm could collect your results into a data frame
 --> pickle data file to Pickledfiles using function: pickle_save_file
 --> unpickle the data file using function: pickle_load_file
 
 '''
-
-import pickle
 
 def save_as_pickle_file(dataframe, filename):
     '''
@@ -272,4 +275,3 @@ def load_pickle_file_to_df(filename):
     path1 = os.path.join(dir_name,filename + "." + format)
     unpickled_dataframe = pd.read_pickle(path1)
     return unpickled_dataframe
-
