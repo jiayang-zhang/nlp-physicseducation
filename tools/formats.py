@@ -2,9 +2,9 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 import time
 import pandas as pd
-plt.style.use(['science', 'ieee'])
-# plt.style.use('seaborn-notebook')
-# plt.style.available
+#plt.style.use(['science', 'ieee'])
+plt.style.use('seaborn-notebook')
+plt.style.available
 
 
 
