@@ -8,6 +8,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
+from sklearn.svm import SVC
 
 #cross validation imports
 from sklearn.model_selection import KFold
@@ -90,6 +91,12 @@ def random_forest(X_train,  X_test, y_train,y_test):
     acc_score = metrics.accuracy_score(y_test, predictions) # single accuracy score
     return predictions
 
+# -- Classification: Support Vector Machine -----
+def support_vec_machine(X_train, X_test, y_train, y_test):
+    # implemented using a kernel: a kernel transforms an input data space into the required form
+    clf = SVC(kernel= 'linear').fit(X_train, y_train)
+    predictions_y = clf.predict(X_test)
+    return predictions_y
 
 # ================================================================================================
 # EVALUATION
@@ -136,6 +143,7 @@ def kfold(model,x, df_y, n_iterations):
 def lr_accuracy_trainsize_plot_general(classifier, x, y, label, feature, num_epochs, train_sizes):
     accuracies = []
     accuracies_sd = []
+    dummy_arr = []
     for size in train_sizes:
         sum = 0
         start_time = time.time()
@@ -157,9 +165,10 @@ def lr_accuracy_trainsize_plot_general(classifier, x, y, label, feature, num_epo
 
         accuracies.append(np.sum(dummy)/num_epochs)
         accuracies_sd.append(np.std(dummy))
+        dummy_arr.append(dummy)
         #print('average accuracy score:', np.sum(dummy)/num_epochs)
         #print("--- %s seconds ---" % (time.time() - start_time))
-    return accuracies, accuracies_sd
+    return accuracies, accuracies_sd, dummy_arr
 
 
 def iterations_of_ml_models(classifier, x, y, label, feature, num_epochs):

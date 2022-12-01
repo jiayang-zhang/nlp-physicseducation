@@ -22,7 +22,7 @@ dir_txtfldr = '/Users/EfiaA/OneDrive - Imperial College London/Imperial academic
 df_files = utils.build_files_dataframe(dir_txtfldr, 'GS_', '.txt')
 
 # -- Get labels ---
-df_labels = utils.build_labels_dataframe('data/labels.xlsx')
+df_labels = utils.build_labels_dataframe('data/labels_y1c1.xlsx')
 
 # -- Merge dataframes --
 df = pd.merge(df_files, df_labels, left_on='StudentID', right_on='StudentID')      # merged dataframe: StudentID, Content, ArgumentLevel, ReasoningLevel
@@ -40,12 +40,16 @@ each list contains 5 accuracy values corresponding to the training size used
 each single value is the average accuracy score for 10 or more iterations (epoch is defined by the user)
 '''
 #%%
+#================================================================================================================
+#                                           ----------- NB ---------------
+#================================================================================================================
 #------ trainsize NB-----------
 # loop over labels for training size, feature extractions: Naive bayes
 accuracies = []
 accuracies_sd = []
 feature2 = []
 labels2  = []
+epochs_accuracies_per_trainsize = []
 for label in labels:
     for feature in features:
         # -- Feature extraction: TF-IDF ---
@@ -57,6 +61,7 @@ for label in labels:
             accuracies_sd.append(t[1])
             feature2.append(feature)
             labels2.append(label)
+            epochs_accuracies_per_trainsize.append(t[2])
         # -- Feature extraction: Bag of Words ---
         elif feature == 'bow':
             wordvec_names, wordvec_counts = ml_tools.BoW(df['Content'].tolist())
@@ -66,8 +71,10 @@ for label in labels:
             accuracies_sd.append(b[1])
             feature2.append(feature)
             labels2.append(label)
+            epochs_accuracies_per_trainsize.append(t[2])
 
 df1 = pd.DataFrame({'feature extraction':feature2,'accuracy':accuracies, 'standdev': accuracies_sd, 'Label': labels2})
+print(epochs_accuracies_per_trainsize[0])
 #%%
 #----- pickled dataframe
 utils.save_as_pickle_file(df1,'NB_trainingsize_plot_2500epochs2')
@@ -79,8 +86,6 @@ print(unpickle_df['Label'])
 for i in range(len(unpickle_df)):
     filepath = 'outputs/{}-NB2-{}epochs-{}-graph.png'.format(unpickle_df['feature extraction'][i], num_epochs, unpickle_df['Label'][i]) # ** always change name **
     formats.scatter_plot(xvalue = train_sizes, yvalue = unpickle_df['accuracy'][i], yerr = unpickle_df['standdev'][i], xlabel = 'Training Size', ylabel = 'Accuracy', filepath = filepath)
-
-
 
 #%%
 # --- inidividual graphs --------
@@ -143,7 +148,7 @@ for i in range(len(unpickle_df)):
 #                                   ---------------- LR -------------
 #==============================================================================================================
 #------ trainsize LR -----------
-# loop over labels for training size, feature extractions: Naive bayes
+
 accuracies_lr = []
 accuracies_sd_lr = []
 feature2_lr = []
@@ -181,5 +186,61 @@ unpickle_df_lr = utils.load_pickle_file_to_df('LR_trainingsize_plot_2500epochs')
 for i in range(len(unpickle_df_lr)):
     filepath = 'outputs/{}-LR2-{}epochs-{}-graph.png'.format(unpickle_df_lr['feature extraction'][i], num_epochs, unpickle_df_lr['Label'][i]) # ** always change name **
     formats.scatter_plot(xvalue = train_sizes, yvalue = unpickle_df_lr['accuracy'][i], yerr = unpickle_df_lr['standdev'][i], xlabel = 'Training Size', ylabel = 'Accuracy', filepath = filepath)
+
+
+#%%
+#=============================================================================================================
+#                                      ------- SVM -----------
+#=============================================================================================================
+import 
+wordvec_names, wordvec_counts = ml_tools.BoW(df['Content'].tolist())
+X_train_s, X_test_s, y_train_s, y_test_s = train_test_split(wordvec_counts,df['ReasoningLevel'].tolist() , train_size = 0.8)
+y_pred = ml_tools.support_vec_machine(X_train_s, X_test_s, y_train_s, y_test_s)
+acc_score = metrics.accuracy_score(y_test_s, y_pred)
+print(acc_score)
+# %%
+#------ trainsize SVM -----------
+
+accuracies_svm = []
+accuracies_sd_svm = []
+feature2_svm = []
+labels2_svm = []
+for label in labels:
+    for feature in features:
+        # -- Feature extraction: TF-IDF ---
+        if feature ==  'ifidf':
+            wordvec_names, wordvec_counts = ml_tools.tf_idf(df['Content'].tolist())
+            print('tfidf')
+            t = ml_tools.lr_accuracy_trainsize_plot_general(ml_tools.support_vec_machine, wordvec_counts, df[label].tolist(),label, feature, num_epochs, train_sizes)
+            accuracies_svm.append(t[0])
+            accuracies_sd_svm.append(t[1])
+            feature2_svm.append(feature)
+            labels2_svm.append(label)
+        # -- Feature extraction: Bag of Words ---
+        elif feature == 'bow':
+            wordvec_names, wordvec_counts = ml_tools.BoW(df['Content'].tolist())
+            print('bow')
+            b = ml_tools.lr_accuracy_trainsize_plot_general(ml_tools.support_vec_machine, wordvec_counts, df[label].tolist(),label, feature, num_epochs, train_sizes)
+            accuracies_svm.append(b[0])
+            accuracies_sd_svm.append(b[1])
+            feature2_svm.append(feature)
+            labels2_svm.append(label)
+
+df1_svm= pd.DataFrame({'feature extraction':feature2_svm,'accuracy':accuracies_svm, 'standdev': accuracies_sd_svm, 'Label': labels2_svm})
+print(df1_svm)
+#%%
+#----- pickled dataframe --------
+utils.save_as_pickle_file(df1_svm,'SVM_trainingsize_plot_2500epochs1')
+
+#%%
+unpickle_df_svm = utils.load_pickle_file_to_df('SVM_trainingsize_plot_2500epochs1')
+
+#%%
+for i in range(len(unpickle_df_svm)):
+    filepath = 'outputs/{}-SVM2-{}epochs-{}-graph.png'.format(unpickle_df_svm['feature extraction'][i], num_epochs, unpickle_df_svm['Label'][i]) # ** always change name **
+    formats.scatter_plot(xvalue = train_sizes, yvalue = unpickle_df_svm['accuracy'][i], yerr = unpickle_df_svm['standdev'][i], xlabel = 'Training Size', ylabel = 'Accuracy', filepath = filepath)
+
+# %%
+print(unpickle_df_svm['accuracy'].iloc[0])
 
 # %%
