@@ -11,9 +11,11 @@ from torch.utils.data import TensorDataset, DataLoader, RandomSampler, Sequentia
 from tools import ml_tools, utils
 
 # =======================================================================================================================================
-dir_csv = 'outputs/labels_cleaned.csv' # csv file input path
+# * set which dataset you would like to train *
+dir_csv = 'outputs/labels_cleaned_y1c1c2.csv' # csv file input path
 bert_path = 'outputs/bert_model/'    # output paths
 # =======================================================================================================================================
+# * set how you would like it to be trained *
 label = 'ReasoningLevel' # 'ArgumentLevel', 'ReasoningLevel'
 # =======================================================================================================================================
 
