@@ -8,7 +8,8 @@ from tools import ml_tools, formats
 
 
 # =======================================================================================================================================
-dir_csv = 'outputs/labels_cleaned.csv'
+# * set which dataset you would like to train *
+dir_csv = 'outputs/labels_cleaned_y1c1c2.csv'
 # =======================================================================================================================================
 # * set how you would like it to be trained *
 labels = ['ArgumentLevel','ReasoningLevel'] # 'ArgumentLevel', 'ReasoningLevel'
