@@ -51,3 +51,12 @@ def scatter_plot_asone(xvalue = [0,0], yvalue = [0,0], yerr = [0,0], xlabel = No
     plt.grid(b=True, which='minor', color='#999999', linestyle='-', alpha=0.2)
     plt.savefig(filepath)
     return
+
+def histogram(xvalue, xlabel, ylabel, file_path,size):
+    plt.figure()
+    plt.hist(xvalue)
+    plt.ylabel(ylabel)
+    plt.xlabel(xlabel)
+    plt.savefig(file_path)
+    return
+
