@@ -158,29 +158,38 @@ def xml_to_txt(dir_xml, dir_txt, filename, alltext = True, processtext = True):
 
 def getparagraphs(dir_xml, filename):
     '''
-    Not ready yet...
+    Get the paragraph next to Results <head>
     '''
-    # read .xml file
+
+    # Read .xml file
     try:
-        with open(os.path.join(dir_xml, filename+'.tei.xml'), 'r') as file: # parse xml as txt
+        # Parse xml as txt
+        with open(os.path.join(dir_xml, filename+'.tei.xml'), 'r') as file:
             content = file.read()
+
     except FileNotFoundError:
         print(("The .xml directory does not exist"))
-    soup = bs(content, 'xml') # parse xml
+
+    # Parse xml
+    soup = bs(content, 'xml')
 
 
     # extract <head> and <p>
     out = []
     for head in soup.select('head'):
-        if 'result' in head.get_text().lower(): # check lowercase <head>, works with "RESULTS AND"
+
+        # check lowercase <head>, works with "RESULTS AND"
+        if 'result' in head.get_text().lower():
+
+            # Get the paragraph next to <head>
             s = head.next_sibling
             if s == None:
                 print('No text found...')
                 print('error filename:',filename)
             else:
                 out.append(s.get_text(' ', strip=True)) #string
+
             # TO DO: More next_sibling loops here until References head
-    # print(out)
 
     return out
 
