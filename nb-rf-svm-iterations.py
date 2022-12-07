@@ -17,21 +17,22 @@ from tools import utils, ml_tools, formats
 # =======================================================================================================================================
 # * set how you would like it to be trained *
 
-
 # ================================================================================================
 #path = '/Users/jiayangzhang/Library/CloudStorage/OneDrive-ImperialCollegeLondon/year4/nlp-physicseducation/testfiles'
 path= '/Users/EfiaA/OneDrive - Imperial College London/Imperial academic work/University life/Y4\MSci project/Project_Coding/nlp-physicseducation/testfiles'
 dir_txtfldr = '/Users/EfiaA/OneDrive - Imperial College London/Imperial academic work/University life/Y4/MSci project/Project_Coding/anonymised_reports/anonymised_reports/year_1_2017/cycle_1/txt'
 # ================================================================================================
 
+dir_csv = 'outputs/labels_cleaned_y1c1c2.csv'
+df = pd.read_csv(dir_csv, encoding='utf-8')
 # -- Get files ---
-df_files = utils.build_files_dataframe(dir_txtfldr, 'GS_', '.txt')
+    # df_files = utils.build_files_dataframe(dir_txtfldr, 'GS_', '.txt')
 
-# -- Get labels ---
-df_labels = utils.build_labels_dataframe('data/labels_y1c1.xlsx')
+    # # -- Get labels ---
+    # df_labels = utils.build_labels_dataframe('data/labels_y1c1.xlsx')
 
-# -- Merge dataframes --
-df = pd.merge(df_files, df_labels, left_on='StudentID', right_on='StudentID')      # merged dataframe: StudentID, Content, ArgumentLevel, ReasoningLevel
+    # # -- Merge dataframes --
+    # df = pd.merge(df_files, df_labels, left_on='StudentID', right_on='StudentID')      # merged dataframe: StudentID, Content, ArgumentLevel, ReasoningLevel
 
 #%%
 labels = ['ArgumentLevel','ReasoningLevel'] # 'ArgumentLevel', 'ReasoningLevel'
@@ -83,6 +84,20 @@ df1 = pd.DataFrame({'feature extraction':feature2,'accuracy':accuracies, 'standd
 df_nb_acc = pd.DataFrame(data = epochs_accuracies_per_trainsize, index = ['AL-ifidf', 'AL-bow', 'RL-ifidf', 'RL-bow'], columns=['0.5','0.6','0.7','0.8','0.9'] )
 #%%
 print(df_nb_acc)
+
+#%%
+#----- pickled dataframe --------
+utils.save_as_pickle_file(df1,'NB_trainingsize_plot_2500epochs_y1c1c2')
+#utils.save_as_pickle_file(df_nb_acc,'NB_trainingsize_arraystopandas_freqhist_2500epochs')
+
+#----- unpicked data frame ------
+unpickle_df = utils.load_pickle_file_to_df('NB_trainingsize_plot_2500epochs_y1c1c2')
+#%%
+#----- individual graphs ------
+for i in range(len(unpickle_df)):
+    filepath = 'outputs/{}-NB2-{}epochs-{}-graph.png'.format(unpickle_df['feature extraction'][i], num_epochs, unpickle_df['Label'][i]) # ** always change name **
+    formats.scatter_plot(xvalue = train_sizes, yvalue = unpickle_df['accuracy'][i], yerr = unpickle_df['standdev'][i], xlabel = 'Training Size', ylabel = 'Accuracy', filepath = filepath)
+
 #%%
 # ---- histograph frequency plots -------
 tsizes_str = ['0.5','0.6','0.7','0.8','0.9']
@@ -92,19 +107,6 @@ for size in tsizes_str:
         filepath = 'outputs/{}-NB2-{}epochs-freq histograms-{}.png'.format(num_epochs,size,ft_ext[cell]) # ** always change name **
         formats.histogram(df_nb_acc[size][cell], 'Accuracy', 'Frequency', filepath, size)
 
-
-#%%
-#----- pickled dataframe --------
-utils.save_as_pickle_file(df1,'NB_trainingsize_plot_2500epochs2')
-#utils.save_as_pickle_file(df_nb_acc,'NB_trainingsize_arraystopandas_freqhist_2500epochs')
-
-#----- unpicked data frame ------
-unpickle_df = utils.load_pickle_file_to_df('NB_trainingsize_plot_2500epochs2')
-
-#----- individual graphs ------
-for i in range(len(unpickle_df)):
-    filepath = 'outputs/{}-NB2-{}epochs-{}-graph.png'.format(unpickle_df['feature extraction'][i], num_epochs, unpickle_df['Label'][i]) # ** always change name **
-    formats.scatter_plot(xvalue = train_sizes, yvalue = unpickle_df['accuracy'][i], yerr = unpickle_df['standdev'][i], xlabel = 'Training Size', ylabel = 'Accuracy', filepath = filepath)
 
 #%%
 #=============================================================================================================================
@@ -141,15 +143,15 @@ for label in labels:
 df1_rf = pd.DataFrame({'feature extraction':feature2_rf,'accuracy':accuracies_rf, 'standdev': accuracies_sd_rf, 'Label': labels2_rf})
 #%%
 #----- pickled dataframe
-utils.save_as_pickle_file(df1_rf,'RF_trainingsize_plot_2500epochs1')
+utils.save_as_pickle_file(df1_rf,'RF_trainingsize_plot_2500epochs_y1c1c2')
 
 #%%
-unpickle_df = utils.load_pickle_file_to_df('RF_trainingsize_plot_2500epochs')
-print(unpickle_df['Label'])
+unpickle_df1 = utils.load_pickle_file_to_df('RF_trainingsize_plot_2500epochs_y1c1c2')
+
 #%%
-for i in range(len(unpickle_df)):
-    filepath = 'outputs/{}-RF2-{}epochs-{}-graph.png'.format(unpickle_df['feature extraction'][i], num_epochs, unpickle_df['Label'][i]) # ** always change name **
-    formats.scatter_plot(xvalue = train_sizes, yvalue = unpickle_df['accuracy'][i], yerr = unpickle_df['standdev'][i], xlabel = 'Training Size', ylabel = 'Accuracy', filepath = filepath)
+for i in range(len(unpickle_df1)):
+    filepath = 'outputs/{}-RF2-{}epochs-{}-graph.png'.format(unpickle_df1['feature extraction'][i], num_epochs, unpickle_df1['Label'][i]) # ** always change name **
+    formats.scatter_plot(xvalue = train_sizes, yvalue = unpickle_df1['accuracy'][i], yerr = unpickle_df1['standdev'][i], xlabel = 'Training Size', ylabel = 'Accuracy', filepath = filepath)
 
 #%%
 #=============================================================================================================
@@ -185,10 +187,10 @@ for label in labels:
 df1_lr= pd.DataFrame({'feature extraction':feature2_lr,'accuracy':accuracies_lr, 'standdev': accuracies_sd_lr, 'Label': labels2_lr})
 #%%
 #----- pickled dataframe --------
-utils.save_as_pickle_file(df1_lr,'LR_trainingsize_plot_2500epochs1')
+utils.save_as_pickle_file(df1_lr,'LR_trainingsize_plot_500epochs_y1c1c2')
 
 #%%
-unpickle_df_lr = utils.load_pickle_file_to_df('LR_trainingsize_plot_2500epochs')
+unpickle_df_lr = utils.load_pickle_file_to_df('LR_trainingsize_plot_500epochs_y1c1c2')
 
 #%%
 for i in range(len(unpickle_df_lr)):
@@ -200,12 +202,12 @@ for i in range(len(unpickle_df_lr)):
 #=============================================================================================================
 #                                      ------- SVM -----------
 #=============================================================================================================
-import 
-wordvec_names, wordvec_counts = ml_tools.BoW(df['Content'].tolist())
-X_train_s, X_test_s, y_train_s, y_test_s = train_test_split(wordvec_counts,df['ReasoningLevel'].tolist() , train_size = 0.8)
-y_pred = ml_tools.support_vec_machine(X_train_s, X_test_s, y_train_s, y_test_s)
-acc_score = metrics.accuracy_score(y_test_s, y_pred)
-print(acc_score)
+# from sklearn import metrics
+# wordvec_names, wordvec_counts = ml_tools.BoW(df['Content'].tolist())
+# X_train_s, X_test_s, y_train_s, y_test_s = train_test_split(wordvec_counts,df['ReasoningLevel'].tolist() , train_size = 0.8)
+# y_pred = ml_tools.support_vec_machine(X_train_s, X_test_s, y_train_s, y_test_s)
+# acc_score = metrics.accuracy_score(y_test_s, y_pred)
+# print(acc_score)
 # %%
 #------ trainsize SVM -----------
 
@@ -235,13 +237,13 @@ for label in labels:
             labels2_svm.append(label)
 
 df1_svm= pd.DataFrame({'feature extraction':feature2_svm,'accuracy':accuracies_svm, 'standdev': accuracies_sd_svm, 'Label': labels2_svm})
-print(df1_svm)
-#%%
-#----- pickled dataframe --------
-utils.save_as_pickle_file(df1_svm,'SVM_trainingsize_plot_2500epochs1')
 
 #%%
-unpickle_df_svm = utils.load_pickle_file_to_df('SVM_trainingsize_plot_2500epochs1')
+#----- pickled dataframe --------
+utils.save_as_pickle_file(df1_svm,'SVM_trainingsize_plot_2500epochs_y1c1c2')
+
+#%%
+unpickle_df_svm = utils.load_pickle_file_to_df('SVM_trainingsize_plot_2500epochs_y1c1c2')
 
 #%%
 for i in range(len(unpickle_df_svm)):
@@ -251,4 +253,3 @@ for i in range(len(unpickle_df_svm)):
 # %%
 print(unpickle_df_svm['accuracy'].iloc[0])
 
-# %%
