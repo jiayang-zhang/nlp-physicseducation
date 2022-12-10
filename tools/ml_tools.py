@@ -18,6 +18,7 @@ from sklearn.model_selection import cross_val_score
 from sklearn import metrics
 import time
 import numpy as np
+from scipy.stats import sem
 # ================================================================================================
 # feature extraction
 # ================================================================================================
@@ -67,6 +68,15 @@ def tf_idf(corpus):
 
 # -- Classification: logistic regression ---
 def logistic_regression(X_train, X_test, y_train):
+
+    # Create an instance of LogisticRegression classifier
+    lr = LogisticRegression(random_state=0)
+    # Fit the model
+    lr.fit(X_train, y_train)
+    y_test_predict = lr.predict(X_test)
+    return  y_test_predict
+
+def logistic_regression2(X_train, X_test, y_train, y_test):
 
     # Create an instance of LogisticRegression classifier
     lr = LogisticRegression(random_state=0)
@@ -164,7 +174,8 @@ def lr_accuracy_trainsize_plot_general(classifier, x, y, label, feature, num_epo
             dummy.append(accuracy_score)
 
         accuracies.append(np.sum(dummy)/num_epochs)
-        accuracies_sd.append(np.std(dummy))
+        #accuracies_sd.append(np.std(dummy))
+        accuracies_sd.append(sem(dummy))
         dummy_arr.append(dummy)
         #print('average accuracy score:', np.sum(dummy)/num_epochs)
         #print("--- %s seconds ---" % (time.time() - start_time))
