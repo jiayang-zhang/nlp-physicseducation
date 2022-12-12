@@ -264,23 +264,23 @@ how to use:
 
 '''
 
-def save_as_pickle_file(dataframe, filename):
+def save_as_pickle_file(dataframe, filename, dir_name):
     '''
     dataframe: pandas dataframe
     filename: string name
     '''
     format = 'pkl'
-    dir_name = r'C:\Users\EfiaA\OneDrive - Imperial College London\Imperial academic work\University life\Y4\MSci project\Project_Coding\nlp-physicseducation\Pickledfiles'
+    #dir_name = r'C:\Users\EfiaA\OneDrive - Imperial College London\Imperial academic work\University life\Y4\MSci project\Project_Coding\nlp-physicseducation\Pickledfiles'
     path1 = os.path.join(dir_name,filename + "." + format)
     dataframe.to_pickle(path1)
     return
 
-def load_pickle_file_to_df(filename):
+def load_pickle_file_to_df(filename, dir_name):
     '''
     filename: string file name
     '''
     format = 'pkl'
-    dir_name = r'C:\Users\EfiaA\OneDrive - Imperial College London\Imperial academic work\University life\Y4\MSci project\Project_Coding\nlp-physicseducation\Pickledfiles'
+    #dir_name = r'C:\Users\EfiaA\OneDrive - Imperial College London\Imperial academic work\University life\Y4\MSci project\Project_Coding\nlp-physicseducation\Pickledfiles'
     path1 = os.path.join(dir_name,filename + "." + format)
     unpickled_dataframe = pd.read_pickle(path1)
     return unpickled_dataframe

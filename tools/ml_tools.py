@@ -101,6 +101,7 @@ def random_forest(X_train,  X_test, y_train,y_test):
     acc_score = metrics.accuracy_score(y_test, predictions) # single accuracy score
     return predictions
 
+
 # -- Classification: Support Vector Machine -----
 def support_vec_machine(X_train, X_test, y_train, y_test):
     # implemented using a kernel: a kernel transforms an input data space into the required form
