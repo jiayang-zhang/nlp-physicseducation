@@ -22,6 +22,10 @@ dir_csv = 'outputs/labels_cleaned_y1c1c2.csv'
 df = pd.read_csv(dir_csv, encoding='utf-8')
 
 #%%
+print(df['ArgumentLevel'])
+
+
+#%%
 labels = ['ArgumentLevel','ReasoningLevel'] # 'ArgumentLevel', 'ReasoningLevel'
 labels2 = ['ArgumentLevel','ReasoningLevel','ArgumentLevel','ReasoningLevel'] # 'ArgumentLevel', 'ReasoningLevel'
 features = ['ifidf','bow'] #'bow', 'ifidf'
@@ -74,9 +78,11 @@ df_nb_acc = pd.DataFrame(data = epochs_accuracies_per_trainsize, index = ['AL-if
 #----- pickled dataframe --------
 utils.save_as_pickle_file(df1,'NB_trainingsize_plot_2500epochs_y1c1c2_sem')
 #utils.save_as_pickle_file(df_nb_acc,'NB_trainingsize_arraystopandas_freqhist_2500epochs')
-
+#%%
 #----- unpicked data frame ------
 unpickle_df = utils.load_pickle_file_to_df('NB_trainingsize_plot_2500epochs_y1c1c2_sem')
+#%%
+print(unpickle_df['accuracy'][0])
 #%%
 #----- individual graphs ------
 for i in range(len(unpickle_df)):
@@ -88,15 +94,29 @@ for i in range(len(unpickle_df)):
 tsizes_str = ['0.5','0.6','0.7','0.8','0.9']
 ft_ext     = ['AL-ifidf', 'AL-bow', 'RL-ifidf', 'RL-bow']
 for size in tsizes_str:
-    for cell in range(len(df_nb_acc[size])) :
+    for cell in range(len(unpickle_df[size])) :
         filepath = 'outputs/{}-NB2-{}epochs-freq histograms-{}.png'.format(num_epochs,size,ft_ext[cell]) # ** always change name **
-        formats.histogram(df_nb_acc[size][cell], 'Accuracy', 'Frequency', filepath, size)
+        formats.histogram(unpickle_df[size][cell], 'Accuracy', 'Frequency', filepath, size)
 
 
 #%%
 #=============================================================================================================================
 #                       ------------- RF ----------------
 #=============================================================================================================================
+#%%
+# little tree extraction example
+from sklearn.ensemble import RandomForestClassifier
+from sklearn import tree
+wordvec_names, wordvec_counts = ml_tools.BoW(df['Content'].tolist())
+X_train_b, X_test_b, y_train_b, y_test_b = train_test_split( wordvec_counts, df['ArgumentLevel'].tolist() , train_size = 0.8)
+
+# random forest model
+rf_model = RandomForestClassifier()
+rf_model.fit(X_train_b, y_train_b)
+plt.figure(figsize=(20,20))
+_ = tree.plot_tree(rf_model.estimators_[0],filled=True)
+
+#%%
 #------ trainsize RF-----------
 # loop over labels for training size, feature extractions: Naive bayes
 accuracies_rf = []
@@ -171,10 +191,10 @@ for label in labels:
 df1_lr= pd.DataFrame({'feature extraction':feature2_lr,'accuracy':accuracies_lr, 'sem': accuracies_sd_lr, 'Label': labels2_lr})
 #%%
 #----- pickled dataframe --------
-utils.save_as_pickle_file(df1_lr,'LR_trainingsize_plot_500epochs_y1c1c2')
+utils.save_as_pickle_file(df1_lr,'LR_trainingsize_plot_500epochs_y1c1c2_sem')
 
 #%%
-unpickle_df_lr = utils.load_pickle_file_to_df('LR_trainingsize_plot_500epochs_y1c1c2')
+unpickle_df_lr = utils.load_pickle_file_to_df('LR_trainingsize_plot_500epochs_y1c1c2_sem')
 
 #%%
 for i in range(len(unpickle_df_lr)):

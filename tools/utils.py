@@ -276,6 +276,7 @@ def save_as_pickle_file(dataframe, filename, dir_name):
     return
 
 def load_pickle_file_to_df(filename, dir_name):
+    # remeber to add the r'directorryyyy........'
     '''
     filename: string file name
     '''
@@ -284,3 +285,17 @@ def load_pickle_file_to_df(filename, dir_name):
     path1 = os.path.join(dir_name,filename + "." + format)
     unpickled_dataframe = pd.read_pickle(path1)
     return unpickled_dataframe
+
+
+#%%
+#heatmap
+import seaborn as sns
+import pandas as pd
+
+x_label = ["EXP", "BAL", "THE", "NONE"]
+Y_label = ["Superficial","Extended", "Deep", "Prediction", "Expert"]
+array   = [[4,24,12,2],[1,14,9,1],[3,11,5,0],[1,0,0,0],[0,5,3,1]]
+
+#create this matrix into a pandas dataframe
+df = pd.DataFrame(array, columns = x_label, index = Y_label)
+sns.heatmap(df, square = True, annot= True, linewidths=3)
