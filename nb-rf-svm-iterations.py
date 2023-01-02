@@ -11,21 +11,11 @@ from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from tools import utils, ml_tools, formats
 
-
-# ================================================================================================
-#path = '/Users/jiayangzhang/Library/CloudStorage/OneDrive-ImperialCollegeLondon/year4/nlp-physicseducation/testfiles'
-path= '/Users/EfiaA/OneDrive - Imperial College London/Imperial academic work/University life/Y4\MSci project/Project_Coding/nlp-physicseducation/testfiles'
-dir_txtfldr = '/Users/EfiaA/OneDrive - Imperial College London/Imperial academic work/University life/Y4/MSci project/Project_Coding/anonymised_reports/anonymised_reports/year_1_2017/cycle_1/txt'
-# ================================================================================================
-
 dir_csv = 'outputs/labels_cleaned_y1c1c2.csv'
 df = pd.read_csv(dir_csv, encoding='utf-8')
 
 #%%
-print(df['ArgumentLevel'])
 
-
-#%%
 labels = ['ArgumentLevel','ReasoningLevel'] # 'ArgumentLevel', 'ReasoningLevel'
 labels2 = ['ArgumentLevel','ReasoningLevel','ArgumentLevel','ReasoningLevel'] # 'ArgumentLevel', 'ReasoningLevel'
 features = ['ifidf','bow'] #'bow', 'ifidf'
@@ -108,13 +98,54 @@ for size in tsizes_str:
 from sklearn.ensemble import RandomForestClassifier
 from sklearn import tree
 wordvec_names, wordvec_counts = ml_tools.BoW(df['Content'].tolist())
-X_train_b, X_test_b, y_train_b, y_test_b = train_test_split( wordvec_counts, df['ArgumentLevel'].tolist() , train_size = 0.8)
+wordvec_names2, wordvec_counts2 = ml_tools.tf_idf(df['Content'].tolist())
+X_train_b, X_test_b, y_train_b, y_test_b = train_test_split( wordvec_counts, df['ArgumentLevel'].tolist() , train_size = 0.5)
+X_train_b2, X_test_b2, y_train_b2, y_test_b2 = train_test_split( wordvec_counts, df['ReasoningLevel'].tolist() , train_size = 0.8)
 
-# random forest model
-rf_model = RandomForestClassifier()
-rf_model.fit(X_train_b, y_train_b)
-plt.figure(figsize=(20,20))
-_ = tree.plot_tree(rf_model.estimators_[0],filled=True)
+#%%
+# RF -- Argument level - bow
+for i in train_sizes:
+    X_train_b, X_test_b, y_train_b, y_test_b = train_test_split( wordvec_counts, df['ArgumentLevel'].tolist() , train_size = i)
+    rf_model = RandomForestClassifier(max_leaf_nodes=20)
+    rf_model.fit(X_train_b, y_train_b)
+    plt.figure(figsize=(40,40))
+    class_names = df['ArgumentLevel']
+    _ = tree.plot_tree(rf_model.estimators_[0],class_names=class_names, feature_names=wordvec_names)
+    plt.savefig('outputs/{}-{}-{}-{}-{}trainratio.png'.format('RF','AL','BOW','DT', i))
+
+#%%
+# RF -- Reasoning level - bow
+for i in train_sizes:
+    X_train_b2, X_test_b2, y_train_b2, y_test_b2 = train_test_split( wordvec_counts, df['ReasoningLevel'].tolist() , train_size = i)
+    rf_model = RandomForestClassifier(max_leaf_nodes=20)
+    rf_model.fit(X_train_b2, y_train_b2)
+    plt.figure(figsize=(40,40))
+    class_names2 = df['ReasoningLevel']
+    _ = tree.plot_tree(rf_model.estimators_[0],class_names=class_names2, feature_names= wordvec_names)
+    plt.savefig('outputs/{}-{}-{}-{}-{}trainratio.png'.format('RF','RL','BOW','DT', i))
+
+#%%
+# RF -- Argument level - tfidf
+for i in train_sizes:
+    X_train_b, X_test_b, y_train_b, y_test_b = train_test_split( wordvec_counts2, df['ArgumentLevel'].tolist() , train_size = i)
+    rf_model = RandomForestClassifier(max_leaf_nodes=20)
+    rf_model.fit(X_train_b, y_train_b)
+    plt.figure(figsize=(40,40))
+    class_names = df['ArgumentLevel']
+    _ = tree.plot_tree(rf_model.estimators_[0],class_names=class_names, feature_names=wordvec_names2)
+    plt.savefig('outputs/{}-{}-{}-{}-{}trainratio.png'.format('RF','AL','TF-IDF','DT',i))
+
+#%%
+# RF -- Reasoning level - tfidf
+for i in train_sizes:
+    X_train_b2, X_test_b2, y_train_b2, y_test_b2 = train_test_split( wordvec_counts, df['ReasoningLevel'].tolist() , train_size = i)
+    rf_model = RandomForestClassifier(max_leaf_nodes=20)
+    rf_model.fit(X_train_b2, y_train_b2)
+    plt.figure(figsize=(40,40))
+    class_names2 = df['ReasoningLevel']
+    _ = tree.plot_tree(rf_model.estimators_[0],class_names=class_names2, feature_names= wordvec_names)
+    plt.savefig('outputs/{}-{}-{}-{}-{}trainratio.png'.format('RF','RL','TFIDF','DT', i))
+
 
 #%%
 #------ trainsize RF-----------
@@ -256,4 +287,3 @@ for i in range(len(unpickle_df_svm)):
 
 # %%
 print(unpickle_df_svm['accuracy'].iloc[0])
-
