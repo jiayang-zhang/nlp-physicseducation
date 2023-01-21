@@ -4,7 +4,6 @@ import os
 import string
 import pandas as pd
 import numpy as np
-pd.set_option('max_colu', 10)
 
 import nltk
 from nltk.tokenize import word_tokenize
@@ -253,6 +252,9 @@ def build_labels_dataframe(dir_xlsx) -> pd.DataFrame:
 
     return df_labels
 
+
+
+'''
 #===================================================================================================================================================================================================
   #PICKLE FILES
 #===================================================================================================================================================================================================
@@ -299,3 +301,4 @@ array   = [[4,24,12,2],[1,14,9,1],[3,11,5,0],[1,0,0,0],[0,5,3,1]]
 #create this matrix into a pandas dataframe
 df = pd.DataFrame(array, columns = x_label, index = Y_label)
 sns.heatmap(df, square = True, annot= True, linewidths=3)
+'''
