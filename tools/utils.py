@@ -254,7 +254,7 @@ def build_labels_dataframe(dir_xlsx) -> pd.DataFrame:
 
 
 
-'''
+
 #===================================================================================================================================================================================================
   #PICKLE FILES
 #===================================================================================================================================================================================================
@@ -263,7 +263,6 @@ how to use:
 --> the machine learning algorithm could collect your results into a data frame
 --> pickle data file to Pickledfiles using function: pickle_save_file
 --> unpickle the data file using function: pickle_load_file
-
 '''
 
 def save_as_pickle_file(dataframe, filename, dir_name):
@@ -289,7 +288,6 @@ def load_pickle_file_to_df(filename, dir_name):
     return unpickled_dataframe
 
 
-#%%
 #heatmap
 import seaborn as sns
 import pandas as pd
@@ -299,6 +297,5 @@ Y_label = ["Superficial","Extended", "Deep", "Prediction", "Expert"]
 array   = [[4,24,12,2],[1,14,9,1],[3,11,5,0],[1,0,0,0],[0,5,3,1]]
 
 #create this matrix into a pandas dataframe
-df = pd.DataFrame(array, columns = x_label, index = Y_label)
-sns.heatmap(df, square = True, annot= True, linewidths=3)
-'''
+#df = pd.DataFrame(array, columns = x_label, index = Y_label)
+#sns.heatmap(df, square = True, annot= True, linewidths=3)
