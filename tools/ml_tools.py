@@ -37,7 +37,7 @@ def BoW(corpus):
     countvec = CountVectorizer()
     dtm = countvec.fit_transform(corpus)  # document-term matrix
 
-    corpus_wordvec_names = countvec.get_feature_names()     # word vector name list
+    corpus_wordvec_names = countvec.get_feature_names_out()     # word vector name list
     corpus_wordvec_counts = dtm.toarray()                   # word vector frequncy list    # len(corpus_wordvec_counts) = len(corpus)
 
     return corpus_wordvec_names, corpus_wordvec_counts
@@ -50,7 +50,7 @@ def tf_idf(corpus):
     countvec    = TfidfVectorizer()
     dtm    = countvec.fit_transform(corpus)
 
-    corpus_wordvec_names = countvec.get_feature_names()
+    corpus_wordvec_names = countvec.get_feature_names_out()
     corpus_wordvec_counts  = dtm.toarray()
 
     return corpus_wordvec_names, corpus_wordvec_counts
