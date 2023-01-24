@@ -160,17 +160,13 @@ def getparagraphs(dir_xml, filename):
     Get the paragraph next to Results <head>
     '''
 
-    # Read .xml file
+    # read .xml file
     try:
-        # Parse xml as txt
-        with open(os.path.join(dir_xml, filename+'.tei.xml'), 'r') as file:
+        with open(os.path.join(dir_xml, filename+'.tei.xml'), 'r') as file: # parse xml as txt
             content = file.read()
-
     except FileNotFoundError:
         print(("The .xml directory does not exist"))
-
-    # Parse xml
-    soup = bs(content, 'xml')
+    soup = bs(content, 'xml') # parse xml
 
 
     # extract <head> and <p>
@@ -183,10 +179,35 @@ def getparagraphs(dir_xml, filename):
             # Get the paragraph next to <head>
             s = head.next_sibling
             if s == None:
-                print('No text found...')
+                print('Cannot get results paragraph ...')
                 print('error filename:',filename)
             else:
                 out.append(s.get_text(' ', strip=True)) #string
+        
+
+
+        if 'conclusion' in head.get_text().lower():
+            
+            # Get the paragraph next to <head>
+            s = head.next_sibling
+            if s == None:
+                print('Cannot get conclusion paragraph ...')
+                print('error filename:',filename)
+            else:
+                out.append(s.get_text(' ', strip=True)) #string
+            
+
+
+        if 'error' in head.get_text().lower():
+            
+            # Get the paragraph next to <head>
+            s = head.next_sibling
+            if s == None:
+                print('Cannot get error paragraph ...')
+                print('error filename:',filename)
+            else:
+                out.append(s.get_text(' ', strip=True)) #string
+
 
             # TO DO: More next_sibling loops here until References head
 
@@ -203,7 +224,6 @@ def getall(dir_xml, filename):
         print(("The .xml directory does not exist"))
     soup = bs(content, 'xml') # parse xml
 
-    # , errors= 'ignore'
 
     # extract every <p>  -- all paragraphs
     out = []
