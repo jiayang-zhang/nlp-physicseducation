@@ -1,0 +1,17 @@
+,ReasoningLevelY1,ReasoningLevelY2,value
+0,the,the,9
+1,the,bal,10
+2,the,exp,3
+3,the,none,4
+4,bal,the,16
+5,bal,bal,12
+6,bal,exp,11
+7,bal,none,5
+8,exp,the,3
+9,exp,bal,5
+10,exp,exp,1
+11,exp,none,0
+12,none,the,1
+13,none,bal,1
+14,none,exp,0
+15,none,none,1
