@@ -12,6 +12,9 @@ from difflib import SequenceMatcher
 from sklearn.feature_extraction.text import CountVectorizer
 import matplotlib.pyplot as plt
 
+# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+'''
 ## Directories
 if os.getenv('HOME').split('/')[2] == 'Efia Amankwa':
     path_pkl = os.getenv('HOME')+'/Dropbox (UiO)/CCSE/Machine Learning Project/papers/pickles/'
@@ -22,9 +25,31 @@ elif os.getenv('HOME').split('/')[2] == 'amarin':
     path_pdf = os.getenv('HOME')+'/dropbox-uio/Dropbox (UiO)/papers/'
 else:
     raise NotADirectoryError('Please define an existing directory for path_pkl')
+'''
 
 ## Utility to find the index of a single word in a list
 find_in_list = lambda l, e: l.index(e) if e in l else -1
+
+# ---------------------------------------------------------------------------
+# New versions that resolves compatibility issues 
+
+## Directories
+# no needs to set path_pkl or path_pdf
+
+
+# Utility to find the index of a single word in a list
+# def find_in_list(l, e):
+#     if e in l:
+#         return l.index(e)
+#     else:
+#         return -1
+
+# print(find_in_list(['dog', 'cat', 'fish'], 'fish')) # returns 2
+# print(find_in_list(['dog', 'cat', 'fish'], 'lion')) # returns -1
+
+# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+
 
 def plot_freq_dist(freq_list, **kwargs):
     '''
