@@ -87,12 +87,12 @@ def NN_data(Neural, X, y,t_size,epoch_no, str_dataname,str_featext, str_year, di
         #input = len(y_train_b)
         model = Neural(Sequential(), input, epoch_no, X_train_b, y_train_b, X_test_b, y_test_b)
         history = model.fit(X_train_b,y_train_b,epochs = epoch_no, verbose=True, validation_data=(X_test_b, y_test_b), batch_size=30 )
-        predictions =  model.predict(X_test_b) 
-        predictions =  np.argmax(predictions, axis=1)
-        y_test_b    =  np.argmax(y_test_b, axis=1)
-        cohen_score = cohen_kappa_score(y_test_b, predictions)
+        # predictions =  model.predict(X_test_b) 
+        # predictions =  np.argmax(predictions, axis=1)
+        # y_test_b    =  np.argmax(y_test_b, axis=1)
+        # cohen_score = cohen_kappa_score(y_test_b, predictions)
 
-        dummy.append(cohen_score)
+        # dummy.append(cohen_score)
         dummy.append(history.history['accuracy'])
         dummy_loss.append(history.history['loss'])
         dummy_val_loss.append(history.history['loss'])
@@ -141,23 +141,13 @@ def NN_data_iteration(Neural, X, y,t_size,epoch_no, it_no, str_dataname,str_feat
         dummy_val_loss = []
         dummy_ck       = []
         dummy_predict  = []
-
+        X_train_b, X_test_b, y_train_b, y_test_b = train_test_split(X, y , train_size = i)
+        input = X_train_b.shape[1]
         for iteration in range(it_no):
-            X_train_b, X_test_b, y_train_b, y_test_b = train_test_split(X, y , train_size = i)
-            input = X_train_b.shape[1]
             model = Neural(Sequential(), input, epoch_no, X_train_b, y_train_b, X_test_b, y_test_b)
             history = model.fit(X_train_b,y_train_b,epochs = epoch_no, verbose=True, validation_data=(X_test_b, y_test_b), batch_size=30 )
-            predictions =  model.predict(X_test_b) 
-            predictions =  np.argmax(predictions, axis=1)
-            y_test_b    =  np.argmax(y_test_b, axis=1)
-            print('prediction', predictions)
-            print('y_test_b', y_test_b)
 
-            #cohen_score = cohen_kappa_score(y_test_b, predictions)
-
-            # len(x) for x in lst
-            #dummy_ck.append(cohen_score)
-            dummy_predict.append(predictions)
+            # dummy_predict.append(predictions)
             dummy.append(history.history['accuracy'])
             dummy_loss.append(history.history['loss'])
             dummy_val_loss.append(history.history['loss'])
@@ -288,13 +278,13 @@ def nn_graph_loss(train_size, df, mlmodel):
     #plt.savefig(filepath)
     return
 
-def nn_graph_general(train_size, df_col, mlmodel, y_axis_string):
+def nn_graph_general(train_size, df_col, df_ft, df_label, mlmodel, y_axis_string):
 
     c = ['r','b','g', 'm'] # colour notation
 
     for i in range(4):
         # all of the arrays will be of size 4 for training size graphs anyway
-        plt.plot(train_size,df_col[i], label = '{}-{}-{}-{}'.format(mlmodel,df['feature extraction'][i],df['Label'][i], 'loss'), color =c[i],marker='o', markersize =4 )
+        plt.plot(train_size,df_col[i], label = '{}-{}-{}-{}'.format(mlmodel,df_ft[i],df_label[i], 'loss'), color =c[i],marker='o', markersize =4 )
 
 
     plt.xlabel(' Training size')
@@ -303,3 +293,41 @@ def nn_graph_general(train_size, df_col, mlmodel, y_axis_string):
     #filepath = 'outputs/comparison-{}-2500epochs-overallgraph_new.png'.format(mlmodel)
     #plt.savefig(filepath)
     return
+
+
+##################################### NN INVESTIGATIONS  ##########################################################################################################
+
+#==================================== NUMBER OF NODES ==========================================================
+def NN_invest(model1, input1, ephs, X_t, y_t, X_test, y_test, node1, node2, node3):
+    maxlen = 100 
+    model = model1
+    model.add(layers.Dense(node1, input_dim = input, activation  = 'relu'))
+    model.add(layers.Dense(node2, input_dim = input, activation  = 'relu'))
+    model.add(layers.Dense(node3 ,activation = 'sigmoid'))
+    model.add(layers.Flatten())
+    model.compile(loss= 'binary_crossentropy', optimizer= 'adam', metrics= ['accuracy'])
+    model.build(input1)
+    model.summary()
+    history = model.fit(X_t,y_t,epochs = ephs, verbose=True, validation_data=(X_test, y_test), batch_size=30 )
+    return history
+
+
+
+def NN_data_invest(X, y, tsize,  epoch_no, node1, node2, node3):
+    X_train_b, X_test_b, y_train_b, y_test_b = train_test_split(X, y , train_size = tsize )
+    input = X_train_b.shape[1] 
+    nn1 = NN_invest(Sequential(), input, epoch_no, X_train_b, y_train_b, X_test_b, y_test_b, node1, node2, node3)
+    return pd.DataFrame(nn1.history)
+
+
+################################################################### EXTRA CODE ######################################################################
+            # predictions =  model.predict(X_test_b) 
+            # predictions =  np.argmax(predictions, axis=1)
+            # y_test_b    =  np.argmax(y_test_b, axis=1)
+            # print('prediction', predictions)
+            # print('y_test_b', y_test_b)
+
+            #cohen_score = cohen_kappa_score(y_test_b, predictions)
+
+            # len(x) for x in lst
+            #dummy_ck.append(cohen_score)

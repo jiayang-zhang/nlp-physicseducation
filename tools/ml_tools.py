@@ -13,6 +13,7 @@ from sklearn.svm import SVC
 #cross validation imports
 from sklearn.model_selection import KFold
 from sklearn.model_selection import cross_val_score
+from sklearn.metrics import cohen_kappa_score
 
 #evaluation imports
 from sklearn import metrics
@@ -155,41 +156,47 @@ def lr_accuracy_trainsize_plot_general(classifier, x, y, label, feature, num_epo
     accuracies = []
     accuracies_sd = []
     dummy_arr = []
+    ck_1 = []
     for size in train_sizes:
         sum = 0
         start_time = time.time()
 
         dummy = []
+        dummy_ck = []
         for epoch in range(num_epochs):
-            # split train/test data
             X_train, X_test, y_train, y_test = train_test_split(x, y, train_size = size)
-            #print('X_train',X_train)
-            #print('y_train', y_train)
-           
+
             # train model + prediction
             y_test_predict = classifier(X_train, X_test, y_train, y_test)
-            #print('predictions:', y_test_predict)
-            # Accuracy
+   
             accuracy_score = sanity_check(X_test, y_test, y_test_predict, printWrong=False)
-            #print("Epoch {}/{}, Accuracy: {:.3f}".format(epoch+1,num_epochs, accuracy_score))
+ 
+            cohen_score = cohen_kappa_score(y_test_predict, y_test)
+
             dummy.append(accuracy_score)
+            dummy_ck.append(cohen_score)
+        
+
 
         accuracies.append(np.sum(dummy)/num_epochs)
-        #accuracies_sd.append(np.std(dummy))
         accuracies_sd.append(sem(dummy))
         dummy_arr.append(dummy)
-        #print('average accuracy score:', np.sum(dummy)/num_epochs)
-        #print("--- %s seconds ---" % (time.time() - start_time))
-    return accuracies, accuracies_sd, dummy_arr
+
+        ck_1.append(np.sum(dummy_ck))
+
+    print('total cohen array (no av just sum)', ck_1)
+    return accuracies, accuracies_sd, dummy_arr, ck_1
 
 
 def iterations_of_ml_models(classifier, x, y, label, feature, num_epochs):
     accuracies = []
     accuracies_sd = []
+    ck = []
     sum = 0
     start_time = time.time()
 
     dummy = []
+    dummy_ck = []
     for epoch in range(num_epochs):
         # split train/test data
         X_train, X_test, y_train, y_test = train_test_split(x, y, train_size = size)
@@ -202,7 +209,9 @@ def iterations_of_ml_models(classifier, x, y, label, feature, num_epochs):
         # Accuracy
         accuracy_score = sanity_check(X_test, y_test, y_test_predict, printWrong=False)
         #print("Epoch {}/{}, Accuracy: {:.3f}".format(epoch+1,num_epochs, accuracy_score))
+
         dummy.append(accuracy_score)
+   
 
     accuracies.append(np.sum(dummy)/num_epochs)
     accuracies_sd.append(np.std(dummy))
