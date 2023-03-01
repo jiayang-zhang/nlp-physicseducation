@@ -408,3 +408,160 @@ def NN_data_invest(X, y, tsize,  epoch_no, node1, node2, node3):
 
             # len(x) for x in lst
             #dummy_ck.append(cohen_score)
+
+def NN_opt(model1, input1, ephs, X_t, y_t, X_test, y_test, node1, node2, node3, opt):
+    maxlen = 100 
+    model = model1
+    model.add(layers.Dense(node1, input_dim = input, activation  = 'relu'))
+    model.add(layers.Dense(node2, input_dim = input, activation  = 'relu'))
+    #model.add(layers.Dense(node2, input_dim = input, activation  = 'relu'))
+    model.add(layers.Dense(node3 ,activation = 'sigmoid'))
+    model.add(layers.Flatten())
+    model.compile(loss= 'binary_crossentropy', optimizer= opt, metrics= ['accuracy'])
+    model.build(input1)
+    model.summary()
+    history = model.fit(X_t,y_t,epochs = ephs, verbose=True, validation_data=(X_test, y_test), batch_size=30 )
+    return history
+
+
+optimizers = ['Adadelta', 'Adagrad', 'Adam', 'RMSprop', 'SGD']
+def NN_data_opt(X, y, tsize, epoch_no, node1, node2, node3, opt):
+    accuracy = []
+    loss     = []
+    val_loss = []
+    for i in opt:
+        X_train_b, X_test_b, y_train_b, y_test_b = train_test_split(X, y , train_size = tsize)
+        input = X_train_b.shape[1] 
+        nn1 = NN_opt(Sequential(), input, epoch_no, X_train_b, y_train_b, X_test_b, y_test_b, node1, node2, node3, i)
+        accuracy.append(nn1.history['accuracy'])
+        loss.append(nn1.history['loss'])
+        val_loss.append(nn1.history['val_loss'])
+    dictionary = {'accuracy':accuracy, 'loss': loss, 'val_loss':val_loss}
+    df = pd.DataFrame(dictionary)
+    return df
+
+
+def NN_batch(model1, input1, ephs, X_t, y_t, X_test, y_test, node1, node2, node3, bsize):
+    maxlen = 100 
+    model = model1
+    model.add(layers.Dense(node1, input_dim = input, activation  = 'relu'))
+    model.add(layers.Dense(node2, input_dim = input, activation  = 'relu'))
+    model.add(layers.Dense(node3 ,activation = 'sigmoid'))
+    model.add(layers.Flatten())
+    model.compile(loss= 'binary_crossentropy', optimizer= 'Adam', metrics= ['accuracy'])
+    model.build(input1)
+    model.summary()
+    history = model.fit(X_t,y_t,epochs = ephs, verbose=True, validation_data=(X_test, y_test), batch_size=bsize)
+    return history
+
+
+Batchsize = [16,32,64,128,256]
+def NN_data_batch(X, y,tsize, epoch_no, node1, node2, node3, batch_sizes):
+    accuracy = []
+    loss     = []
+    val_loss = []
+    times    = []
+    for i in batch_sizes:
+        
+        X_train_b, X_test_b, y_train_b, y_test_b = train_test_split(X, y , train_size = tsize)
+        input = X_train_b.shape[1] 
+        start_time = time()
+        nn1 = NN_batch(Sequential(), input, epoch_no, X_train_b, y_train_b, X_test_b, y_test_b, node1, node2, node3, i)
+        accuracy.append(nn1.history['accuracy'])
+        loss.append(nn1.history['loss'])
+        val_loss.append(nn1.history['val_loss'])
+        times.append(time()- start_time)
+
+    dictionary = {'accuracy':accuracy, 'loss': loss, 'val_loss':val_loss, 'batch': batch_sizes, 'times':times}
+    df = pd.DataFrame(dictionary)
+    return df
+
+####################################################################### LEARNING RATE ##########################################
+# have to build new NN as I do not want to mix keras and tensorflow
+from keras.models import Sequential
+from keras.layers import Dense, Dropout, LSTM, BatchNormalization
+from keras.callbacks import TensorBoard
+from keras.callbacks import ModelCheckpoint
+from keras.optimizers import Adam
+from keras.layers import Dense
+from keras.models import Sequential
+from keras.optimizers import SGD
+from keras.utils import to_categorical
+
+def NN_opt_lr(model1, input1, ephs, X_t, y_t, X_test, y_test, node1, node2, node3,lrate):
+    maxlen = 100 
+    model = model1
+    model.add(Dense(node1, input_dim = input1, activation  = 'relu'))
+    model.add(Dense(node2, input_dim = input1, activation  = 'relu'))
+    model.add(Dense(node3,  activation = 'sigmoid'))
+    model.add(layers.Flatten())
+    opt = Adam(learning_rate= lrate)
+    model.compile(loss= 'binary_crossentropy', optimizer= opt, metrics= ['accuracy'])
+    model.build(input1)
+    model.summary()
+    history = model.fit(X_t,y_t,epochs = ephs, verbose=True, validation_data=(X_test, y_test), batch_size=30 )
+
+    return history
+
+########################################################### GRID SEARCH OPT ##########################################
+def NN_tune(Optimizer_Trial, Neurons_Trial):
+    maxlen = 100 
+    model = Sequential()
+    model.add(layers.Dense(Neurons_Trial, input_dim = input, activation  = 'relu'))
+    model.add(layers.Dense(Neurons_Trial, input_dim = input, activation  = 'relu'))
+    model.add(layers.Dense(1 ,activation = 'sigmoid'))
+    model.add(layers.Flatten())
+    model.compile(loss= 'binary_crossentropy', optimizer= Optimizer_Trial, metrics= ['accuracy'])
+    #model.build(input1)
+    #model.summary()
+    #history = model.fit(X_t,y_t,epochs = ephs, verbose=True, validation_data=(X_test, y_test), batch_size=bsize)
+    return model
+    
+
+
+Batchsize = [16,32,64,128,256]
+def NN_data_batch2(X, y,tsize, epoch_no, node1, node2, node3, batch_sizes):
+    accuracy = []
+    loss     = []
+    val_loss = []
+    for i in batch_sizes:
+        X_train_b, X_test_b, y_train_b, y_test_b = train_test_split(X, y , train_size = tsize)
+        input = X_train_b.shape[1] 
+        nn1 = NN_batch(Sequential(), input, epoch_no, X_train_b, y_train_b, X_test_b, y_test_b, node1, node2, node3, i)
+        accuracy.append(nn1.history['accuracy'])
+        loss.append(nn1.history['loss'])
+        val_loss.append(nn1.history['val_loss'])
+    dictionary = {'accuracy':accuracy, 'loss': loss, 'val_loss':val_loss, 'batch': batch_sizes}
+    df = pd.DataFrame(dictionary)
+    return df
+
+def NN_data_iteration_investigation(X, y,tsize, epoch_no,it_no, ts):
+    accuracy = []
+    loss     = []
+    val_loss = []
+    accuracy_sem = []
+
+    dummy= []
+    dummy_loss     = []
+    dummy_val_loss = []
+    
+    X_train_b, X_test_b, y_train_b, y_test_b = train_test_split(X, y , train_size = ts, shuffle=True)
+    input = X_train_b.shape[1]
+    for iteration in range(it_no):
+        model = NN_default_parameters(Sequential(), input, epoch_no, X_train_b, y_train_b, X_test_b, y_test_b)
+        history = model.fit(X_train_b,y_train_b,epochs = epoch_no, verbose=True, validation_data=(X_test_b, y_test_b), batch_size=30 )
+
+        dummy.append(history.history['accuracy'])
+        dummy_loss.append(history.history['loss'])
+        dummy_val_loss.append(history.history['loss'])
+
+
+    for no in range(len(dummy)):
+        accuracy.append(np.sum(dummy[no])/len(dummy[no]))
+        accuracy_sem.append(np.sum(sem(dummy[no]))/len(dummy[no]))
+        loss.append(np.sum(dummy_loss[no])/len(dummy[no]))
+        val_loss.append(np.sum(dummy_val_loss[no])/len(dummy[no]))
+
+    dictionary = {'accuracy':accuracy, 'sem':accuracy_sem, 'loss': loss, 'val_loss':val_loss}
+    df = pd.DataFrame(dictionary)
+    return df
