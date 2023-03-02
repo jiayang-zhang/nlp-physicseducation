@@ -518,12 +518,12 @@ def gridsearch_plot(df, no_below = None, aggreg_func = 'mean'):
             	coh_mean = y.groupby(np.arange(len(y))//reps).median()
             print('Maximum %f at num_topics=%d ' % (max(coh_mean), x[0]+list(coh_mean).index(max(coh_mean))))
             _ = ax1.plot(x, coh_mean, c="blue", label="mean");
-            _ = ax1.errorbar(x, coh_mean, yerr=y.groupby(np.arange(len(y))//reps).std(), fmt='--o')
+            _ = ax1.errorbar(x, coh_mean, yerr=y.groupby(np.arange(len(y))//reps).std(), fmt='--', capsize = 3, c = "blue")
             _ = ax1.set_ylabel("Coherence score");
             _ = ax1.set_xlabel("num_topics");
             _ = ax1.xaxis.set_major_locator(MaxNLocator(integer=True))
             _ = plt.legend(loc="best")
-            _ = plt.title("Coherence score. no_below=%s" % (str(nb)))
+            #_ = plt.title("Coherence score. no_below=%s" % (str(nb)))
             if alpha: _ = plt.title("Coherence score. no_below=%s, alpha=%s" % (str(nb), str(alpha)))
             plt.show();
 

@@ -285,7 +285,7 @@ def NN_data_iteration_strat(Neural, X, y,t_size,epoch_no, it_no, k_fold_number, 
     #utils.save_as_pickle_file(acc_rl_bow,name, dir)
     return acc_rl_bow
 
-##################################################################################
+
 
 def plot(dframe_train, dframe_acc, dframe_sem):
     plt.plot(dframe_train, dframe_acc, 'o')
