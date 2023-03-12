@@ -46,9 +46,9 @@ def NN_optimised_parameters(model1, input1, ephs, X_t, y_t, X_test, y_test):
     maxlen = 100 
     model = model1
     model.add(layers.Dense(12, input_dim = input1, activation  = 'relu'))
-    model.add(Dropout(0.7))
+   # model.add(Dropout(0.7))
     model.add(layers.Dense(8, input_dim = input1, activation  = 'relu'))
-    model.add(Dropout(0.7))
+    #model.add(Dropout(0.7))
     model.add(layers.Dense(1,activation = 'sigmoid'))
     #model.add(layers.Dense(5,activation = 'softmax'))
     model.add(layers.Flatten())
