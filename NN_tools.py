@@ -50,10 +50,43 @@ def NN_optimised_parameters(model1, input1, ephs, X_t, y_t, X_test, y_test):
     model.add(layers.Dense(8, input_dim = input1, activation  = 'relu'))
     #model.add(Dropout(0.7))
     model.add(layers.Dense(1,activation = 'sigmoid'))
-    #model.add(layers.Dense(5,activation = 'softmax'))
+    #model.add(layers.Dense(1,activation = 'softmax'))
     model.add(layers.Flatten())
     model.compile(loss= 'binary_crossentropy', optimizer= 'rmsprop', metrics= ['accuracy'])
-    #model.compile(loss= 'sparse_categorical_crossentropy', optimizer= 'rmsprop', metrics= ['accuracy'])
+    #model.compile(loss= 'categorical_crossentropy', optimizer= 'rmsprop', metrics= ['accuracy'])
+    model.build(input1)
+    model.summary()
+    #history = model.fit(X_t,y_t,epochs = ephs, verbose=True, validation_data=(X_test, y_test), batch_size=30 )
+    return model
+
+def NN_optimised_parameters_al(model1, input1, ephs, X_t, y_t, X_test, y_test):
+    maxlen = 100 
+    model = model1
+    model.add(layers.Dense(12, input_dim = input1, activation  = 'relu'))
+   # model.add(Dropout(0.7))
+    model.add(layers.Dense(8, input_dim = input1, activation  = 'relu'))
+    #model.add(Dropout(0.7))
+    #model.add(layers.Dense(1,activation = 'sigmoid'))
+    model.add(layers.Dense(5,activation = 'softmax'))
+    model.add(layers.Flatten())
+    #model.compile(loss= 'binary_crossentropy', optimizer= 'rmsprop', metrics= ['accuracy'])
+    model.compile(loss= 'categorical_crossentropy', optimizer= 'rmsprop', metrics= ['accuracy'])
+    model.build(input1)
+    model.summary()
+    #history = model.fit(X_t,y_t,epochs = ephs, verbose=True, validation_data=(X_test, y_test), batch_size=30 )
+    return model
+def NN_optimised_parameters_epist(model1, input1, ephs, X_t, y_t, X_test, y_test):
+    maxlen = 100 
+    model = model1
+    model.add(layers.Dense(12, input_dim = input1, activation  = 'relu'))
+   # model.add(Dropout(0.7))
+    model.add(layers.Dense(8, input_dim = input1, activation  = 'relu'))
+    #model.add(Dropout(0.7))
+    #model.add(layers.Dense(1,activation = 'sigmoid'))
+    model.add(layers.Dense(4,activation = 'softmax'))
+    model.add(layers.Flatten())
+    #model.compile(loss= 'binary_crossentropy', optimizer= 'rmsprop', metrics= ['accuracy'])
+    model.compile(loss= 'categorical_crossentropy', optimizer= 'rmsprop', metrics= ['accuracy'])
     model.build(input1)
     model.summary()
     #history = model.fit(X_t,y_t,epochs = ephs, verbose=True, validation_data=(X_test, y_test), batch_size=30 )
