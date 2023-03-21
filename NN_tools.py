@@ -151,13 +151,13 @@ def NN_data(Neural, X, y,t_size,epoch_no, str_dataname,str_featext, str_year, di
 
     dict_rl = {'trainsize':t_size, 'accuracy':accuracies, 'sem': accuracies_sem, 'loss':loss, 'valloss': val_loss, 'ck':ck}
     acc_rl_bow = pd.DataFrame(dict_rl)
-    name = 'W5_NN_{}_{}_{}_{}ephs_recent'. format(str_year, str_featext,str_dataname,epoch_no)
-    utils.save_as_pickle_file(acc_rl_bow,name, dir)
+    #name = 'W5_NN_{}_{}_{}_{}ephs_recent'. format(str_year, str_featext,str_dataname,epoch_no)
+    #utils.save_as_pickle_file(acc_rl_bow,name, dir)
     #name = 'NN_{}_{}_trainsize_accuracy_sem_{}ephs_{}'. format(str_dataname,str_featext,'1000', str_year)
     return acc_rl_bow
 
 
-def NN_data_iteration(Neural, X, y,t_size,epoch_no, it_no, str_dataname,str_featext, str_year, dir):
+def NN_data_iteration(Neural, X, y,t_size,epoch_no, it_no):
     
     accuracies     = []
     accuracies_sem = []
@@ -205,110 +205,7 @@ def NN_data_iteration(Neural, X, y,t_size,epoch_no, it_no, str_dataname,str_feat
         loss.append(np.sum(loss1)/len(loss1))
         val_loss.append(np.sum(val_loss1)/len(val_loss1))
 
-        # if dummy_ck == 0.0:
-        #     ck.append(dummy_ck)
-        # else:
-        #     ck.append(np.sum(dummy_ck))
-        
-        #print(ck)
-
-
-    #dict_rl = {'trainsize':t_size, 'accuracy':accuracies, 'sem': accuracies_sem, 'loss':loss, 'valloss': val_loss, 'ck':ck}
-    dict_rl = {'trainsize':t_size, 'accuracy':accuracies, 'sem': accuracies_sem, 'loss':loss, 'valloss': val_loss }
-    acc_rl_bow = pd.DataFrame(dict_rl)
-    #name = 'W5_NN_{}_iteration_{}_{}_{}_{}'. format(it_no, str_year, str_featext,str_dataname,epoch_no)
-    #utils.save_as_pickle_file(acc_rl_bow,name, dir)
-    return acc_rl_bow
-
-def NN_data_ck(Neural, X, y,t_size,epoch_no, str_year):
-    ck    = []
-    dummy = []
-
-    for i in t_size:
-        X_train_b, X_test_b, y_train_b, y_test_b = train_test_split(X, y , train_size = i)
-        input = X_train_b.shape[1]
-        nn1 = Neural(Sequential(), input, epoch_no, X_train_b, y_train_b, X_test_b, y_test_b)
-        history = nn1.fit(X_train_b,y_train_b,epochs = epoch_no, verbose=True, validation_data=(X_test_b, y_test_b), batch_size=30 )
-        predictions =  nn1.predict(X_test_b) 
-        predictions =  np.argmax(predictions, axis=1)
-        y_test_b    =  np.argmax(y_test_b, axis=1)
-        cohen_score = cohen_kappa_score(y_test_b, predictions)
-        dummy.append(cohen_score)
-    
-    for array in dummy:
-        ck.append(np.sum(array)/epoch_no)
-
-    dict_rl = {'trainsize':t_size, 'ck':ck}
-    acc_rl_bow = pd.DataFrame(dict_rl)
-    #name = 'W5_NN_cohenkappa_{}_{}ephs_recent'. format(str_year, epoch_no)
-    #utils.save_as_pickle_file(acc_rl_bow,name, dir)
-    return acc_rl_bow
-
-
-###### Stratified k fold test train and split on 0.8 trainsize ########################################
-from sklearn.model_selection import StratifiedKFold
-
-def NN_data_iteration_strat(Neural, X, y,t_size,epoch_no, it_no, k_fold_number, str_dataname,str_featext, str_year, dir):
-    
-    accuracies     = []
-    accuracies_sem = []
-    loss           = []
-    val_loss       = []
-    ck             = []
-
-    accuracies1     = []
-    accuracies_sem1 = []
-    loss1          = []
-    val_loss1       = []
-
-
-    dummy          = []
-    dummy_loss     = []
-    dummy_val_loss = []
-
-    skf = StratifiedKFold(n_splits= k_fold_number, shuffle = True, random_state=999)
-    
-    for train, test in skf.split(X,y.argmax(1)):
-        #X_train_b, X_test_b = X[train_idex], X[test_index]
-        #y_train_b, y_test_b = y[train_idex], y[test_index]
-        
-        #X_train_b, X_test_b, y_train_b, y_test_b = train_test_split(X, y , train_size = t_size, shuffle=True)
-    
-        input = X[train].shape[1]
-
-        for iteration in range(it_no):
-
-            model = Neural(Sequential(), input, epoch_no, X[train], y[train], X[test], y[test])
-            history = model.fit(X[train],y[train],epochs = epoch_no, verbose=True, validation_data=(X[test], y[test]), batch_size=30 )
-
-            # dummy_predict.append(predictions)
-            dummy.append(history.history['accuracy'])
-            dummy_loss.append(history.history['loss'])
-            dummy_val_loss.append(history.history['loss'])
-            #dummy_ck.append(cohen_kappa_score)
-
-    print(dummy)
-    for no in range(len(dummy)):
-        accuracies1.append(np.sum(dummy[no])/len(dummy[no]))
-        accuracies_sem1.append(np.sum(sem(dummy[no]))/len(dummy[no]))
-        loss1.append(np.sum(dummy_loss[no])/len(dummy[no]))
-        val_loss1.append(np.sum(dummy_val_loss[no])/len(dummy[no]))
-
-
-                
-    
-
-        accuracies.append(np.sum(accuracies1)/len(accuracies1))
-        accuracies_sem.append(np.sum(accuracies_sem1)/len(accuracies_sem1))
-        loss.append(np.sum(loss1)/len(loss1))
-        val_loss.append(np.sum(val_loss1)/len(val_loss1))
-
-        # if dummy_ck == 0.0:
-        #     ck.append(dummy_ck)
-        # else:
-        #     ck.append(np.sum(dummy_ck))
-        
-        #print(ck)
+  
 
 
     #dict_rl = {'trainsize':t_size, 'accuracy':accuracies, 'sem': accuracies_sem, 'loss':loss, 'valloss': val_loss, 'ck':ck}
@@ -431,16 +328,7 @@ def NN_data_invest(X, y, tsize,  epoch_no, node1, node2, node3):
 
 
 ################################################################### EXTRA CODE ######################################################################
-            # predictions =  model.predict(X_test_b) 
-            # predictions =  np.argmax(predictions, axis=1)
-            # y_test_b    =  np.argmax(y_test_b, axis=1)
-            # print('prediction', predictions)
-            # print('y_test_b', y_test_b)
-
-            #cohen_score = cohen_kappa_score(y_test_b, predictions)
-
-            # len(x) for x in lst
-            #dummy_ck.append(cohen_score)
+      
 
 def NN_opt(model1, input1, ephs, X_t, y_t, X_test, y_test, node1, node2, node3, opt):
     maxlen = 100 
